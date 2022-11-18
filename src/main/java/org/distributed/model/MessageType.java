@@ -1,0 +1,5 @@
+package org.distributed.model;
+
+public enum  MessageType {
+    ADD_USER, TEXT_MESSAGE, USER_LOGOUT, USER_LOGIN_SUCCESSFUL, USER_LOGIN_FAIL, USER_LOGOUT_SUCCESSFUL, USER_LOGOUT_FAIL
+}
