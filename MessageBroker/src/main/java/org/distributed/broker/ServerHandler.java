@@ -1,9 +1,6 @@
 package org.distributed.broker;
 
-import org.distributed.model.ChatMessage;
-import org.distributed.model.Message;
-import org.distributed.model.MessageType;
-import org.distributed.model.UserMessage;
+import org.distributed.model.*;
 
 import java.io.*;
 import java.net.Socket;
@@ -18,16 +15,17 @@ public class ServerHandler implements Runnable{
 
     @Override
     public void run() {
-        InputStream inp = null;
+        ObjectInputStream inp = null;
         BufferedReader brinp = null;
         Message msg;
         try {
-            inp = socket.getInputStream();
-            brinp = new BufferedReader(new InputStreamReader(inp));
-            //TODO: typecast read input into message
-            msg = new UserMessage();
+            inp = (ObjectInputStream) socket.getInputStream();
+            // TODO: verify if this gives messgase class
+            msg = (Message) inp.readObject();
         } catch (IOException e) {
             return;
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
         }
 
         try {
@@ -37,17 +35,26 @@ public class ServerHandler implements Runnable{
             }
             else {
                 ClientCache clientCache = ClientCache.getInstance();
-                ClientHandler clientHandler = clientCache.getClient(msg.getFromUser().getUserName());
-                if(clientHandler == null) {
-                    clientCache.addClient(msg.getFromUser().getUserName(), new ClientHandler(msg.getFromUser()));
-                    clientHandler = clientCache.getClient(msg.getFromUser().getUserName());
-                }
 
                 if(msg.getMessageType() == MessageType.TEXT_MESSAGE) {
+                    User to = ((ChatMessage)msg).getToUser();
+                    ClientHandler clientHandler = clientCache.getClient(to.getUserName());
+                    if(clientHandler == null) {
+                        clientCache.addClient(to.getUserName(), new ClientHandler(to));
+                        clientHandler = clientCache.getClient(to.getUserName());
+                    }
                     clientHandler.addMessage((ChatMessage) msg);
                 }
                 else {
-                    clientHandler.sendAuthResponse((UserMessage) msg);
+                    ClientHandler clientHandler = clientCache.getClient(msg.getFromUser().getUserName());
+
+                    if(msg.getMessageType() == MessageType.USER_LOGIN_FAIL || msg.getMessageType() == MessageType.USER_LOGIN_SUCCESSFUL
+                        || msg.getMessageType() == MessageType.USER_LOGOUT_FAIL || msg.getMessageType() == MessageType.USER_LOGOUT_SUCCESSFUL) {
+                        clientHandler.sendAuthResponse((UserMessage) msg);
+                    }
+                    else {
+                        clientHandler.sendFriendResponse((FriendMessage) msg);
+                    }
                 }
             }
         }

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.distributed.broker.ClientCache;
 import org.distributed.broker.ClientHandler;
 import org.distributed.model.ChatMessage;
+import org.distributed.model.FriendMessage;
 import org.distributed.model.Message;
 import org.distributed.model.UserMessage;
 import org.java_websocket.WebSocket;
@@ -42,15 +43,21 @@ public class ClientManager extends WebSocketServer {
         // TODO: pass it as serialized string stream
         ObjectMapper mapper = new ObjectMapper();
         try {
+            //TODO: verify json to object conversion
             Message msg = mapper.readValue(request, Message.class);
             UserMessage userMsg;
             ChatMessage chatMsg;
+            FriendMessage friendMsg;
             switch (msg.getMessageType()) {
                 case ADD_USER:
                 case USER_LOGOUT:
                     userMsg = (UserMessage) msg;
                     handleAuth(webSocket, userMsg);
                     break;
+                case ADD_FRIEND_REQUEST:
+                case GET_FRIENDS_REQUEST:
+                    friendMsg = (FriendMessage) msg;
+                    handleFriends(webSocket, friendMsg);
                 case TEXT_MESSAGE:
                     chatMsg = (ChatMessage) msg;
                     handleConversation(webSocket, chatMsg);
@@ -94,7 +101,15 @@ public class ClientManager extends WebSocketServer {
             else {
                 clientHandler.setWebSocket(webSocket);
             }
-            loadOutputStream.writeChars(userMessage.toString());
+            loadOutputStream.writeObject(userMessage);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void handleFriends(WebSocket webSocket, FriendMessage friendMessage){
+        try {
+            loadOutputStream.writeObject(friendMessage);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -102,7 +117,7 @@ public class ClientManager extends WebSocketServer {
 
     private void handleConversation(WebSocket webSocket, ChatMessage chatMessage){
         try {
-            loadOutputStream.writeChars(chatMessage.toString());
+            loadOutputStream.writeObject(chatMessage);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

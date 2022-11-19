@@ -1,5 +1,7 @@
 package org.distributed.broker;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.distributed.model.*;
 import org.java_websocket.WebSocket;
 
@@ -26,6 +28,7 @@ public class ClientHandler implements Runnable {
     private WebSocket webSocket;
     private Queue<Message> messageQueue;
     private final Lock qLock = new ReentrantLock();
+    private final Lock sockLock = new ReentrantLock();
     private final Condition queueNotFull = qLock.newCondition();
     private final Condition queueNotEmpty = qLock.newCondition();
 
@@ -43,18 +46,17 @@ public class ClientHandler implements Runnable {
     }
 
     public void setWebSocket(WebSocket webSocket) {
-        qLock.lock();
+        sockLock.lock();
         this.webSocket = webSocket;
         this.state = ClientState.ACTIVE;
-        queueNotFull.signalAll();
-        qLock.unlock();
+        sockLock.unlock();
     }
 
     public void removeWebSocket() {
-        qLock.lock();
+        sockLock.lock();
         this.webSocket = null;
         this.state = ClientState.INACTIVE;
-        qLock.unlock();
+        sockLock.unlock();
     }
 
     public void addMessage(ChatMessage msg) {
@@ -75,13 +77,35 @@ public class ClientHandler implements Runnable {
     }
 
     public void sendAuthResponse(UserMessage userMessage) {
-        webSocket.send(userMessage.toString());
-        if(userMessage.getMessageType() == MessageType.USER_LOGOUT_SUCCESSFUL || userMessage.getMessageType() == MessageType.USER_LOGIN_FAIL) {
-            removeWebSocket();
+        //TODO: verify json stringify
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            String messageJson = mapper.writeValueAsString(userMessage);
+            sockLock.lock();
+            webSocket.send(messageJson);
+            sockLock.unlock();
+            if(userMessage.getMessageType() == MessageType.USER_LOGOUT_SUCCESSFUL || userMessage.getMessageType() == MessageType.USER_LOGIN_FAIL) {
+                removeWebSocket();
+            }
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void sendFriendResponse(FriendMessage friendMessage) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            String messageJson = mapper.writeValueAsString(friendMessage);
+            sockLock.lock();
+            webSocket.send(messageJson);
+            sockLock.unlock();
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
     }
 
     public void run() {
+        ObjectMapper mapper = new ObjectMapper();
         while(!stop) {
             qLock.lock();
             try{
@@ -91,13 +115,18 @@ public class ClientHandler implements Runnable {
 
                 ChatMessage msg = (ChatMessage) messageQueue.element();
                 //TODO: Convert the message into Socket response format.
+                sockLock.lock();
                 if(webSocket != null) {
-                    webSocket.send(String.valueOf(msg).getBytes());
+                    String messageJson = mapper.writeValueAsString(msg);
+                    webSocket.send(messageJson);
                     messageQueue.poll();
                 }
+                sockLock.unlock();
 
             } catch (InterruptedException e) {
                 System.out.println(e.getMessage());
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
             }
         }
     }

@@ -1,5 +1,21 @@
 package org.distributed.model;
 
-public enum  MessageType {
-    ADD_USER, TEXT_MESSAGE, USER_LOGOUT, USER_LOGIN_SUCCESSFUL, USER_LOGIN_FAIL, USER_LOGOUT_SUCCESSFUL, USER_LOGOUT_FAIL
+public enum MessageType {
+
+    // User Message
+    ADD_USER,
+    USER_LOGIN_SUCCESSFUL,
+    USER_LOGIN_FAIL,
+    USER_LOGOUT,
+    USER_LOGOUT_SUCCESSFUL,
+    USER_LOGOUT_FAIL,
+    // Friend Message
+    ADD_FRIEND_REQUEST,
+    ADD_FRIEND_SUCCESSFUL,
+    ADD_FRIEND_FAIL,
+    GET_FRIENDS_REQUEST,
+    GET_FRIENDS_SUCCESSFUL,
+    GET_FRIENDS_FAIL,
+    // Chat Message
+    TEXT_MESSAGE
 }

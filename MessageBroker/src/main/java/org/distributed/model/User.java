@@ -1,5 +1,7 @@
 package org.distributed.model;
 
+import java.util.Objects;
+
 public class User {
     private String userName;
     private Integer userId;
@@ -26,5 +28,15 @@ public class User {
 
     public Integer getUid() {
         return userId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) return true;
+        if(null == o || o.getClass() != this.getClass()) return false;
+
+        User other = (User) o;
+
+        return Objects.equals(this.userName, other.userName);
     }
 }
