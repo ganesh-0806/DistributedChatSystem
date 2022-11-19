@@ -71,7 +71,7 @@ public class ClientManager extends WebSocketServer {
 
     @Override
     public void onError(WebSocket webSocket, Exception e) {
-
+        //TODO: get associated client handler and remove the web socket
     }
 
     @Override
