@@ -1,0 +1,18 @@
+export default  class MessageType {
+    // Chat Message
+    static TEXT_MESSAGE = 'TEXT_MESSAGE';
+    // User Message
+    static ADD_USER = 'ADD_USER';
+    static USER_LOGIN_SUCCESSFUL = 'USER_LOGIN_SUCCESSFUL';
+    static USER_LOGIN_FAIL = 'USER_LOGIN_FAIL';
+    static USER_LOGOUT = 'USER_LOGOUT';
+    static USER_LOGOUT_SUCCESSFUL = 'USER_LOGOUT_SUCCESSFUL';
+    static USER_LOGOUT_FAIL = 'USER_LOGOUT_FAIL';
+    // Friend Message
+    static ADD_FRIEND_REQUEST = 'ADD_FRIEND_REQUEST';
+    static ADD_FRIEND_SUCCESSFUL = 'ADD_FRIEND_SUCCESSFUL';
+    static ADD_FRIEND_FAIL = 'ADD_FRIEND_FAIL';
+    static GET_FRIENDS_REQUEST = 'GET_FRIENDS_REQUEST';
+    static GET_FRIENDS_SUCCESSFUL = 'GET_FRIENDS_SUCCESSFUL';
+    static GET_FRIENDS_FAIL = 'GET_FRIENDS_FAIL';
+}
