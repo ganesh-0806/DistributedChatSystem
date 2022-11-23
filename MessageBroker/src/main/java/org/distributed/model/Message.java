@@ -1,6 +1,6 @@
 package org.distributed.model;
 
-public abstract class Message {
+public class Message {
     private User fromUser;
     private MessageType type;
 

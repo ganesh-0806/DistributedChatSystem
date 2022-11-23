@@ -1,9 +1,7 @@
-package org.distributed;
-
 import org.distributed.connector.ClientManager;
 import org.distributed.connector.ServerManager;
 
-public class Main {
+public class MyTest {
     public static void main(String[] args) {
         // Start Client Manager
         ClientManager clientManager = new ClientManager(5678);
