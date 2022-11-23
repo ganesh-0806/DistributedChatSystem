@@ -14,7 +14,7 @@ class App extends Component {
         super();
 
         this.state = {
-            modalOpen: false,
+            modalOpen: true,
             userName: '',
             userPassword: ''
         }
@@ -34,8 +34,9 @@ class App extends Component {
 
         this.registerSocket();
         const socket = Singleton.getInstance();
-        let messageDto = JSON.stringify({ fromUser: this.state.userName, password: this.state.inputValue, type: MessageType.ADD_USER });
+        let messageDto = JSON.stringify({ fromUser: this.state.userName, password: this.state.userPassword, type: MessageType.ADD_USER });
         socket.send(messageDto);
+
 
         this.setState({modalOpen: false});
     } 
@@ -73,6 +74,7 @@ class App extends Component {
                 case MessageType.USER_LOGIN_FAIL:
                     break;
                 case MessageType.USER_LOGIN_SUCCESSFUL:
+                    self.setState({modalOpen: false});
                 case MessageType.USER_LOGOUT_FAIL:
                 case MessageType.USER_LOGOUT_SUCCESSFUL:
                 case MessageType.TEXT_MESSAGE:
