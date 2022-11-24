@@ -1,10 +1,14 @@
 package org.distributed.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class FriendMessage extends Message{
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class FriendMessage extends Message implements Serializable {
     private ArrayList<User> friends;
-    private String errDesc;
+    private String desc;
 
     public FriendMessage(User from, MessageType type){
         super(from, type);
@@ -13,16 +17,20 @@ public class FriendMessage extends Message{
 
     public FriendMessage(User from, String desc, MessageType type){
         super(from, type);
-        this.errDesc = desc;
+        this.desc = desc;
         friends = new ArrayList<User>();
     }
 
-    public void setErrDesc(String errDesc) {
-        this.errDesc = errDesc;
+    public FriendMessage(){
+        super();
     }
 
-    public String getErrDesc() {
-        return this.errDesc;
+    public void setDesc(String errDesc) {
+        this.desc = errDesc;
+    }
+
+    public String getDesc() {
+        return this.desc;
     }
 
     public void setFriends(ArrayList<User> friends) {

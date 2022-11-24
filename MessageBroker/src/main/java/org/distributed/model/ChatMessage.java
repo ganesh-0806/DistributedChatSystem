@@ -1,16 +1,21 @@
 package org.distributed.model;
 
-public class ChatMessage extends Message{
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import java.io.Serializable;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class ChatMessage extends Message implements Serializable {
     private User toUser;
     private String message;
 
-    ChatMessage(User from, User to, String msg, MessageType type) {
+    public ChatMessage(User from, User to, String msg, MessageType type) {
         super(from, type);
         toUser = to;
         message = msg;
     }
 
-    ChatMessage() {
+    public ChatMessage() {
         super();
 
     }

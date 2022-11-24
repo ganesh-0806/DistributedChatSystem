@@ -84,7 +84,7 @@ public class ClientHandler implements Runnable {
             sockLock.lock();
             webSocket.send(messageJson);
             sockLock.unlock();
-            if(userMessage.getMessageType() == MessageType.USER_LOGOUT_SUCCESSFUL || userMessage.getMessageType() == MessageType.USER_LOGIN_FAIL) {
+            if(userMessage.getType() == MessageType.USER_LOGOUT_SUCCESSFUL || userMessage.getType() == MessageType.USER_LOGIN_FAIL) {
                 removeWebSocket();
             }
         } catch (JsonProcessingException e) {

@@ -37,7 +37,7 @@ public class ServerHandler implements Runnable{
             else {
                 ClientCache clientCache = ClientCache.getInstance();
 
-                if(msg.getMessageType() == MessageType.TEXT_MESSAGE) {
+                if(msg.getType() == MessageType.TEXT_MESSAGE) {
                     User to = ((ChatMessage)msg).getToUser();
                     ClientHandler clientHandler = clientCache.getClient(to.getUserName());
                     if(clientHandler == null) {
@@ -49,8 +49,8 @@ public class ServerHandler implements Runnable{
                 else {
                     ClientHandler clientHandler = clientCache.getClient(msg.getFromUser().getUserName());
 
-                    if(msg.getMessageType() == MessageType.USER_LOGIN_FAIL || msg.getMessageType() == MessageType.USER_LOGIN_SUCCESSFUL
-                        || msg.getMessageType() == MessageType.USER_LOGOUT_FAIL || msg.getMessageType() == MessageType.USER_LOGOUT_SUCCESSFUL) {
+                    if(msg.getType() == MessageType.USER_LOGIN_FAIL || msg.getType() == MessageType.USER_LOGIN_SUCCESSFUL
+                        || msg.getType() == MessageType.USER_LOGOUT_FAIL || msg.getType() == MessageType.USER_LOGOUT_SUCCESSFUL) {
                         clientHandler.sendAuthResponse((UserMessage) msg);
                     }
                     else {

@@ -1,28 +1,37 @@
 package org.distributed.model;
 
-public class UserMessage extends Message{
-    private String password;
-    private String errDesc;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-    UserMessage(User user, String password, String desc, MessageType type) {
+import java.io.Serializable;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class UserMessage extends Message implements Serializable {
+    private String password;
+    private String desc;
+
+    public UserMessage(User user, String password, String desc, MessageType type) {
         super(user, type);
         this.password = password;
-        this.errDesc = desc;
+        this.desc = desc;
     }
 
     //LOGIN, FAILURES
-    UserMessage(User user, String msg, MessageType type) {
+    public UserMessage(User user, String password, MessageType type) {
         super(user, type);
         if(type == MessageType.ADD_USER) {
-            this.password = msg;
+            this.password = password;
         }
         else {
-            this.errDesc = msg;
+            this.desc = password;
         }
     }
 
+    public UserMessage() {
+        super();
+    }
+
     // LOGOUT, SUCCESSES
-    UserMessage(User user, MessageType type) {
+    public UserMessage(User user, MessageType type) {
         super(user, type);
     }
 
@@ -34,11 +43,11 @@ public class UserMessage extends Message{
         return this.password;
     }
 
-    public void setDescription(String desc) {
-        this.errDesc = desc;
+    public void setDesc(String desc) {
+        this.desc = desc;
     }
 
-    public String getDescription() {
-        return this.errDesc;
+    public String getDesc() {
+        return this.desc;
     }
 }

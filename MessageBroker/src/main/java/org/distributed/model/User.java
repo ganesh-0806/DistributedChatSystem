@@ -11,6 +11,10 @@ public class User {
         userId = id;
     }
 
+    public User(String uname) {
+        userName = uname;
+    }
+
     public User(){
     }
 
