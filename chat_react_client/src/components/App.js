@@ -13,6 +13,8 @@ class App extends Component {
     constructor() {
         super();
 
+        this.registerSocket();
+
         this.state = {
             modalOpen: true,
             userName: '',
@@ -32,13 +34,14 @@ class App extends Component {
 
     handleAuth(type) {
 
-        this.registerSocket();
+        
         const socket = Singleton.getInstance();
-        let messageDto = JSON.stringify({ fromUser: this.state.userName, password: this.state.userPassword, type: MessageType.ADD_USER });
+        let messageDto = JSON.stringify({ fromUser: this.state.userName, password: this.state.userPassword, desc: "", type: MessageType.ADD_USER });
+        
         socket.send(messageDto);
 
 
-        this.setState({modalOpen: false});
+        //this.setState({modalOpen: false});
     } 
 
     componentDidMount() {
@@ -63,8 +66,12 @@ class App extends Component {
     }
 
     registerSocket() {
+
+        console.log("registering socket");
         let self = this;
         this.socket = Singleton.getInstance();
+
+        //this.socket.open();
     
         this.socket.onmessage = (response) => {
             let message = JSON.parse(response.data);
@@ -74,7 +81,9 @@ class App extends Component {
                 case MessageType.USER_LOGIN_FAIL:
                     break;
                 case MessageType.USER_LOGIN_SUCCESSFUL:
+                    console.log("In switch response successful");
                     self.setState({modalOpen: false});
+                    break;
                 case MessageType.USER_LOGOUT_FAIL:
                 case MessageType.USER_LOGOUT_SUCCESSFUL:
                 case MessageType.TEXT_MESSAGE:
@@ -105,6 +114,7 @@ class App extends Component {
     
         this.socket.onopen = () => {
             //TODO: 
+            console.log('Connected socket');
         }
 
         window.onbeforeunload = () => {

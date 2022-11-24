@@ -1,8 +1,11 @@
+import {w3cwebsocket as W3CWebSocket} from "websocket";
+
 const AppConfig = {
-    PROTOCOL: "wss:",
+    PROTOCOL: "ws:",
     // TODO: change to localhost if you wish to run it locally
-    HOST: "//serene-wave-94653.herokuapp.com",
-    PORT: ":9000"
+    //HOST: "//serene-wave-94653.herokuapp.com",
+    HOST: "//localhost",
+    PORT: ":5678"
 }
 
 const Singleton = (function () {
@@ -10,7 +13,7 @@ const Singleton = (function () {
 
     function createInstance() {
         // TODO: add +  PORT if you want to run it locally
-        const socket = new WebSocket(AppConfig.PROTOCOL + AppConfig.HOST);
+        const socket = new W3CWebSocket(AppConfig.PROTOCOL + AppConfig.HOST + AppConfig.PORT);
         return socket;
     }
 
