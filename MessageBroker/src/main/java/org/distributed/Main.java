@@ -9,7 +9,8 @@ public class Main {
         ClientManager clientManager = new ClientManager(5678);
         clientManager.start();
         // Start Server Manager
-        ServerManager serverManager = new ServerManager(8888);
+        //ServerManager serverManager = new ServerManager(8888);
+	ServerManager serverManager = new ServerManager((ArrayList<Integer>) Arrays.asList(8888, 8080));
         new Thread(serverManager).start();
     }
 }
