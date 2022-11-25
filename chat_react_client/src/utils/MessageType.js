@@ -1,4 +1,5 @@
 export default  class MessageType {
+    static SELECT_USER = 'SELECT_USER';
     // Chat Message
     static TEXT_MESSAGE = 'TEXT_MESSAGE';
     // User Message

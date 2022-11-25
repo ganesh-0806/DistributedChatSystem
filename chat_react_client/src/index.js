@@ -3,10 +3,11 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './components/App';
 import reportWebVitals from './reportWebVitals';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 import { Provider } from 'react-redux';
 import thunk from 'redux-thunk';
-import { createStore, applyMiddleware, combineReducers, bindActionCreators } from 'redux';
+import { createStore, applyMiddleware, combineReducers } from 'redux';
 import reducers from './reducers';
 
 const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);

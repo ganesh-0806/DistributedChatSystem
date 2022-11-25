@@ -6,6 +6,8 @@ import Singleton from '../utils/Socket'
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as actions from '../actions/index';
+import ChatNavbar from './ChatNavbar';
+import Chat from "./Chat";
 
 
 class App extends Component {
@@ -16,49 +18,53 @@ class App extends Component {
         this.registerSocket();
 
         this.state = {
-            modalOpen: true,
-            userName: '',
-            userPassword: ''
+            modalOpen: false,
+            userName: 'gregoti',
+            userPassword: '',
         }
     }
 
     updateUserName = (value) => {
         console.log(value);
-        this.setState({userName: value});
+        this.setState({ userName: value });
     };
 
     updatePassword = (value) => {
         console.log(value);
-        this.setState({userPassword: value});
+        this.setState({ userPassword: value });
     };
 
     handleAuth(type) {
 
-        
+
         const socket = Singleton.getInstance();
         let messageDto = JSON.stringify({ fromUser: this.state.userName, password: this.state.userPassword, desc: "", type: MessageType.ADD_USER });
-        
+
         socket.send(messageDto);
 
 
         //this.setState({modalOpen: false});
-    } 
+    }
 
     componentDidMount() {
         //Fetch session
     }
 
     render() {
-        //const chat = this.state.modalOpen ? '' : <Chat />
+        const chat = this.state.modalOpen ? '' : <Chat />
         return (
             <div className="App">
+                <ChatNavbar />
+                <div style={{ float: "right" , paddingRight:"200px" }}>
+                    {chat}
+                </div>
                 <Dialog
                     modal={true}
                     open={this.state.modalOpen}>
                     <Login
-                    handleAuth={(type) => this.handleAuth(type)}
-                    handleUserChange = {(event) => this.updateUserName(event.target.value)}
-                    handlePassChange = {(event) => this.updatePassword(event.target.value)}
+                        handleAuth={(type) => this.handleAuth(type)}
+                        handleUserChange={(event) => this.updateUserName(event.target.value)}
+                        handlePassChange={(event) => this.updatePassword(event.target.value)}
                     />
                 </Dialog>
             </div>
@@ -72,26 +78,42 @@ class App extends Component {
         this.socket = Singleton.getInstance();
 
         //this.socket.open();
-    
+
         this.socket.onmessage = (response) => {
             let message = JSON.parse(response.data);
             let users;
-    
+
             switch (message.type) {
                 case MessageType.USER_LOGIN_FAIL:
+                    self.props.loginFailAck();
                     break;
                 case MessageType.USER_LOGIN_SUCCESSFUL:
                     console.log("In switch response successful");
-                    self.setState({modalOpen: false});
+                    self.props.loginSuccessAck(message.fromUser);
+                    self.setState({ modalOpen: false });
                     break;
                 case MessageType.USER_LOGOUT_FAIL:
+                    self.props.logoutFailAck(message.fromUser);
+                    break;
                 case MessageType.USER_LOGOUT_SUCCESSFUL:
+                    self.props.logoutSuccessAck();
+                    self.setState({ modalOpen: true });
+                    break;
                 case MessageType.TEXT_MESSAGE:
+                    self.props.messageReceived(message.fromUser,message.toUser, message.message);
                     break;
                 case MessageType.GET_FRIENDS_SUCCESSFUL:
+                    self.props.getFriendsSuccessAck(message.friends);
+                    break;
                 case MessageType.GET_FRIENDS_FAIL:
+                    self.props.getFriendsFailAck();
+                    break;
                 case MessageType.ADD_FRIEND_SUCCESSFUL:
+                    self.props.addFriendSuccessAck(message.friends[0]);
+                    break;
                 case MessageType.ADD_FRIEND_FAIL:
+                    self.props.addFriendFailAck();
+                    break;
 
                 /* case MessageType.TEXT_MESSAGE:
                     self.props.messageReceived(message);
@@ -111,7 +133,7 @@ class App extends Component {
                 default:
             }
         }
-    
+
         this.socket.onopen = () => {
             //TODO: 
             console.log('Connected socket');
@@ -122,14 +144,15 @@ class App extends Component {
             this.socket.send(messageDto);
         }
     }
-    
+
 }
 
 function mapStateToProps(state) {
     return {
         messages: state.message,
         users: state.users,
-        thisUser: state.thisUser
+        thisUser: state.thisUser,
+        user: state.user
     }
 }
 
@@ -143,7 +166,9 @@ function mapDispatchToProps(dispatch, props) {
         addFriendFailAck: actions.addFriendFailAck,
         getFriendsSuccessAck: actions.getFriendsSuccessAck,
         getFriendsFailAck: actions.getFriendsFailAck,
-        messageReceived: actions.messageReceived
+        messageReceived: actions.messageReceived,
+        addMessage: actions.addMessage,
+        selectUser: actions.selectUser
     }, dispatch);
 }
 

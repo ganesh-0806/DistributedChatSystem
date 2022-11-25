@@ -1,10 +1,29 @@
-export function messageReceived(from, msg) {
+export function messageReceived(from, to, msg) {
     return {
         type: 'TEXT_MESSAGE',
         fromUser: from,
+        toUser: to,
         message: msg
     }
 }
+
+export function addMessage(from, to, msg) {
+    return {
+        type: 'TEXT_MESSAGE',
+        fromUser: from,
+        to: to,
+        message: msg
+    }
+}
+
+
+export function selectUser(user) {
+    return {
+        type: 'SELECT_USER',
+        user: user
+    }
+}
+
 
 export function loginSuccessAck(user) {
     return {
