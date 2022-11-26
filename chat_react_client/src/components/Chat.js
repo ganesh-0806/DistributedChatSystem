@@ -4,7 +4,7 @@ import "../styles.css";
 import { ChatFeed, ChatBubble, BubbleGroup, Message } from "react-chat-ui";
 
 const styles = {
-    
+
     button: {
         backgroundColor: "#fff",
         borderColor: "#1D2129",
@@ -27,6 +27,12 @@ const styles = {
     }
 };
 
+const customBubble = props => (
+    <div>
+        <p>{`${props.message.senderName} ${props.message.id ? "says" : "said"}: ${props.message.message}`}</p>
+    </div>
+);
+
 
 class Chat extends React.Component {
     constructor() {
@@ -37,7 +43,18 @@ class Chat extends React.Component {
                 new Message({ id: "Mark", message: "Hey guys!", senderName: "Mark" })
             ]
         }
-        
+
+    }
+
+    handleSubmit = (event) => {
+        event.preventDefault();
+        console.log(this.message.value, this.props.thisUser);
+        this.setState({
+            messages: [...this.state.messages, new Message({ id: 0, message: this.message.value, senderName: "You" })]
+        });
+        this.props.handleSend(this.message.value);
+        this.message.value = '';
+        console.log(this.props);
     }
 
     render() {
@@ -45,12 +62,15 @@ class Chat extends React.Component {
             <div className="container">
                 <div className="chatfeed-wrapper">
                     <ChatFeed
+                        chatBubble={customBubble}
                         messages={this.state.messages} // Boolean: list of message objects
                         showSenderName
+                        bubblesCentered={false}
                     />
 
-                    <form onSubmit={e => { e.preventDefault(); this.props.addMessage(this.props.thisUser, this.props.user, e.target.value)}}>
+                    <form onSubmit={e => { console.log(this.message); this.handleSubmit(e) }} >
                         <input
+                            ref={m => { this.message = m; }}
                             placeholder="Type a message..."
                             className="message-input"
                         />

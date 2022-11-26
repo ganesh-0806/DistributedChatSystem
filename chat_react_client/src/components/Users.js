@@ -1,25 +1,33 @@
 import React from 'react';
+import Button from '@mui/material/Button';  
 
 class Users extends React.Component {
+
+    constructor() {
+        super();
+    }
     render() {
         return (
-            <ul className="user_list">
-                {
+            <div className="user_list">
+                {/*
+                    //this.props.users
                     this.props.users.map((user) => {
+                        console.log(user.userName);
                         return (
-                            <li className="user_list__item" key={user.userName} value={user.userName} onClick={(e) => this.props.selectUser(e.target.value)}>
-                                {user.userName}
-                            </li>
+                            <div>
+                            <Button variant="text" value={user.userName} onClick={(e) => {console.log(e.target.value); /*this.props.selectUser(e.target.value) }}>{user.userName}</Button> 
+                            <br></br>
+                            </div>
                         );
                     })
-                }
-            </ul>
+                */}
+            </div>
         );
     }
 }
 
-UserList.propTypes = {
+/*UserList.propTypes = {
     users: React.PropTypes.array.isRequired
-};
+};*/
 
 export default Users;

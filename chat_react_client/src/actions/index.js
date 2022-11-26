@@ -9,9 +9,9 @@ export function messageReceived(from, to, msg) {
 
 export function addMessage(from, to, msg) {
     return {
-        type: 'TEXT_MESSAGE',
+        type: 'ADD_MESSAGE',
         fromUser: from,
-        to: to,
+        toUser: to,
         message: msg
     }
 }
@@ -26,30 +26,31 @@ export function selectUser(user) {
 
 
 export function loginSuccessAck(user) {
+    console.log('reached action');
     return {
         type: 'USER_LOGIN_SUCCESSFUL',
-        thisUser: user
+        user: user
     }
 }
 
 export function loginFailAck() {
     return {
         type: 'USER_LOGIN_FAIL',
-        thisUser: ''
+        user: ''
     }
 }
 
 export function logoutSuccessAck() {
     return {
         type: 'USER_LOGOUT_SUCCESSFUL',
-        thisUser: ''
+        user: ''
     }
 }
 
 export function logoutFailAck(user) {
     return {
         type: 'USER_LOGOUT_FAIL',
-        thisUser: user
+        user: user
     }
 }
 

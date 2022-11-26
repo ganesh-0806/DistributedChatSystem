@@ -8,6 +8,7 @@ import { bindActionCreators } from 'redux';
 import * as actions from '../actions/index';
 import ChatNavbar from './ChatNavbar';
 import Chat from "./Chat";
+import Users from "./Users"
 
 
 class App extends Component {
@@ -18,8 +19,8 @@ class App extends Component {
         this.registerSocket();
 
         this.state = {
-            modalOpen: false,
-            userName: 'gregoti',
+            modalOpen: true,
+            userName: '',
             userPassword: '',
         }
     }
@@ -36,25 +37,30 @@ class App extends Component {
 
     handleAuth(type) {
 
-
+        console.log(this.props.thisUser);
         const socket = Singleton.getInstance();
         let messageDto = JSON.stringify({ fromUser: this.state.userName, password: this.state.userPassword, desc: "", type: MessageType.ADD_USER });
 
         socket.send(messageDto);
+    }
 
-
-        //this.setState({modalOpen: false});
+    handleSend = (message) => {
+        this.props.addMessage(this.props.thisUser, this.props.user, message);
     }
 
     componentDidMount() {
-        //Fetch session
     }
 
     render() {
-        const chat = this.state.modalOpen ? '' : <Chat />
+        const chatNav = this.state.modalOpen ? '' : <ChatNavbar />
+        const users = this.state.modalOpen ? '' : <Users />
+        const chat = this.state.modalOpen ? '' : <Chat handleSend={(message) => this.handleSend(message)} />
         return (
             <div className="App">
-                <ChatNavbar />
+                {chatNav}
+                <div style={{ float: "left" , paddingRight:"200px" }}>
+                    {users}
+                </div>
                 <div style={{ float: "right" , paddingRight:"200px" }}>
                     {chat}
                 </div>
@@ -75,9 +81,8 @@ class App extends Component {
 
         console.log("registering socket");
         let self = this;
+        console.log(this.props);
         this.socket = Singleton.getInstance();
-
-        //this.socket.open();
 
         this.socket.onmessage = (response) => {
             let message = JSON.parse(response.data);
@@ -88,19 +93,19 @@ class App extends Component {
                     self.props.loginFailAck();
                     break;
                 case MessageType.USER_LOGIN_SUCCESSFUL:
-                    console.log("In switch response successful");
-                    self.props.loginSuccessAck(message.fromUser);
+                    console.log(self.props);
+                    self.props.loginSuccessAck(message.fromUser.userName);
                     self.setState({ modalOpen: false });
                     break;
                 case MessageType.USER_LOGOUT_FAIL:
-                    self.props.logoutFailAck(message.fromUser);
+                    self.props.logoutFailAck(message.fromUser.userName);
                     break;
                 case MessageType.USER_LOGOUT_SUCCESSFUL:
                     self.props.logoutSuccessAck();
                     self.setState({ modalOpen: true });
                     break;
                 case MessageType.TEXT_MESSAGE:
-                    self.props.messageReceived(message.fromUser,message.toUser, message.message);
+                    self.props.messageReceived(message.fromUser.userName, message.toUser.userName, message.message);
                     break;
                 case MessageType.GET_FRIENDS_SUCCESSFUL:
                     self.props.getFriendsSuccessAck(message.friends);
@@ -109,33 +114,16 @@ class App extends Component {
                     self.props.getFriendsFailAck();
                     break;
                 case MessageType.ADD_FRIEND_SUCCESSFUL:
-                    self.props.addFriendSuccessAck(message.friends[0]);
+                    self.props.addFriendSuccessAck(message.friends[0].userName);
                     break;
                 case MessageType.ADD_FRIEND_FAIL:
                     self.props.addFriendFailAck();
                     break;
-
-                /* case MessageType.TEXT_MESSAGE:
-                    self.props.messageReceived(message);
-                    break;
-                case MessageType.USER_JOINED:
-                    users = JSON.parse(message.data);
-                    self.props.userJoined(users);
-                    break;
-                case MessageType.USER_LEFT:
-                    users = JSON.parse(message.data);
-                    self.props.userLeft(users);
-                    break;
-                case MessageType.USER_JOINED_ACK:
-                    let thisUser = message.user;
-                    self.props.userJoinedAck(thisUser);
-                    break;*/
                 default:
             }
         }
 
         this.socket.onopen = () => {
-            //TODO: 
             console.log('Connected socket');
         }
 
