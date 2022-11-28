@@ -17,7 +17,6 @@ public class ServerHandler implements Runnable{
     @Override
     public void run() {
         ObjectInputStream inp = null;
-        BufferedReader brinp = null;
         Message msg;
         try {
             inp = (ObjectInputStream) socket.getInputStream();

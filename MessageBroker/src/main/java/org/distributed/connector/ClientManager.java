@@ -92,7 +92,7 @@ public class ClientManager extends WebSocketServer {
 
         //TODO: Get the load balancer IP
         InetAddress host;
-        /*try {
+        try {
              host = InetAddress.getLocalHost();
              loadSocket = new Socket(host, 9876);
              loadOutputStream = (ObjectOutputStream) loadSocket.getOutputStream();
@@ -100,23 +100,24 @@ public class ClientManager extends WebSocketServer {
             throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }*/
+        }
 
     }
 
     private void handleAuth(WebSocket webSocket, UserMessage userMessage){
         System.out.println(" in Auth" + userMessage.getFromUser().getUserName() + " " + userMessage.getPassword());
-        ObjectMapper mapper = new ObjectMapper();
+        /*ObjectMapper mapper = new ObjectMapper();
         try {
             webSocket.send(mapper.writeValueAsString(new UserMessage(userMessage.getFromUser(), "", "", MessageType.USER_LOGIN_SUCCESSFUL)));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
-        }
-        /*try {
+        }*/
+        try {
             ClientCache clientCache = ClientCache.getInstance();
             ClientHandler clientHandler = clientCache.getClient(userMessage.getFromUser().getUserName());
             if(clientHandler == null) {
-                clientCache.addClient(userMessage.getFromUser().getUserName(), new ClientHandler(userMessage.getFromUser(), webSocket));
+                clientHandler = new ClientHandler(userMessage.getFromUser(), webSocket);
+                clientCache.addClient(userMessage.getFromUser().getUserName(), clientHandler);
             }
             else {
                 clientHandler.setWebSocket(webSocket);
@@ -124,22 +125,22 @@ public class ClientManager extends WebSocketServer {
             loadOutputStream.writeObject(userMessage);
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }*/
+        }
     }
 
     private void handleFriends(WebSocket webSocket, FriendMessage friendMessage){
-        /*try {
+        try {
             loadOutputStream.writeObject(friendMessage);
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }*/
+        }
     }
 
     private void handleConversation(WebSocket webSocket, ChatMessage chatMessage){
-        /*try {
+        try {
             loadOutputStream.writeObject(chatMessage);
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }*/
+        }
     }
 }

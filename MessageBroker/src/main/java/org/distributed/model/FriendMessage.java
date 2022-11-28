@@ -15,6 +15,11 @@ public class FriendMessage extends Message implements Serializable {
         friends = new ArrayList<User>();
     }
 
+    public FriendMessage(User from, ArrayList<User> friends, MessageType type){
+        super(from, type);
+        this.friends = new ArrayList<User>(friends);
+    }
+
     public FriendMessage(User from, String desc, MessageType type){
         super(from, type);
         this.desc = desc;

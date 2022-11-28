@@ -31,6 +31,7 @@ public class ClientHandler implements Runnable {
     private final Lock sockLock = new ReentrantLock();
     private final Condition queueNotFull = qLock.newCondition();
     private final Condition queueNotEmpty = qLock.newCondition();
+    private final Condition sockActive = sockLock.newCondition();
 
     public ClientHandler(User user) {
         this.user = user;
@@ -49,6 +50,7 @@ public class ClientHandler implements Runnable {
         sockLock.lock();
         this.webSocket = webSocket;
         this.state = ClientState.ACTIVE;
+        sockActive.signalAll();
         sockLock.unlock();
     }
 
@@ -109,25 +111,36 @@ public class ClientHandler implements Runnable {
         while(!stop) {
             qLock.lock();
             try{
-                while (messageQueue.size() ==0 || this.state == ClientState.INACTIVE) {
+                while (messageQueue.size() ==0)  {
                     queueNotFull.await();
                 }
 
-                ChatMessage msg = (ChatMessage) messageQueue.element();
-                //TODO: Convert the message into Socket response format.
                 sockLock.lock();
+                while( this.state == ClientState.INACTIVE) {
+                    sockActive.await();
+                }
+
+                ChatMessage msg = (ChatMessage) messageQueue.element();
+
                 if(webSocket != null) {
                     String messageJson = mapper.writeValueAsString(msg);
                     webSocket.send(messageJson);
                     messageQueue.poll();
                 }
-                sockLock.unlock();
+
+                queueNotEmpty.signalAll();
 
             } catch (InterruptedException e) {
                 System.out.println(e.getMessage());
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
+
+            finally {
+                sockLock.unlock();
+                qLock.unlock();
+            }
+
         }
     }
     public void stop() {
