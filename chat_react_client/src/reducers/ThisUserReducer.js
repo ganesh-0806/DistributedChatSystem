@@ -4,9 +4,9 @@ export default function (state = null, action) {
             console.log("reached reducer");
             return action.user;
         case 'USER_LOGIN_FAIL':
-            return action.user;
+            return '';
         case 'USER_LOGOUT_SUCCESSFUL':
-            return action.user;
+            return '';
         case 'USER_LOGOUT_FAIL':
             return action.user;
         default:

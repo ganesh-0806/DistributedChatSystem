@@ -8,7 +8,34 @@ import NavDropdown from 'react-bootstrap/NavDropdown';
 
 class ChatNavbar extends Component {
 
+
+    constructor() {
+        super();
+
+        this.state = {
+            friend: ''
+        }
+    }
+
+    updateFriend(event) {
+        event.preventDefault()
+        this.setState({friend: event.target.value});
+    }
+
+    handleAddFriend(event) {
+        event.preventDefault();
+        console.log("Handle add friend", this.state.friend);
+        this.props.handleAddFriend(this.state.friend);
+        this.friend.value = '';
+    }
+
     render() {
+
+        if(this.props.modalOpen || this.props.thisUser == '' )
+            return null;
+
+        console.log(this.props.thisUser);
+
     return (
         <Navbar bg="light" expand="lg">
             <Container fluid>
@@ -22,14 +49,16 @@ class ChatNavbar extends Component {
                 >
                 
                 </Nav>
-                <Form className="d-flex">
+                <Form className="d-flex" onSubmit={(event) => {this.handleAddFriend(event)}}>
                 <Form.Control
                     type="search"
                     placeholder="Search"
                     className="me-2"
                     aria-label="Search"
+                    onChange={(event) => {this.updateFriend(event)}}
+                    ref={frnd => { this.friend = frnd; }}
                 />
-                <Button style={{ whiteSpace: 'nowrap' }} variant="outline-success">Add Friend</Button>
+                <Button style={{ whiteSpace: 'nowrap' }} variant="outline-success" >Add Friend</Button>
                 </Form>
             </Navbar.Collapse>
             </Container>

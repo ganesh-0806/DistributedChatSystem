@@ -7,26 +7,30 @@ class Users extends React.Component {
         super();
     }
     render() {
+
+        if(this.props.modalOpen || this.props.thisUser == '' )
+            return null;
+
         return (
             <div className="user_list">
-                {/*
+                {
                     //this.props.users
-                    this.props.users.map((user) => {
+                    this.props.userList.map((user) => {
                         console.log(user.userName);
                         return (
-                            <div>
-                            <Button variant="text" value={user.userName} onClick={(e) => {console.log(e.target.value); /*this.props.selectUser(e.target.value) }}>{user.userName}</Button> 
+                            <div key={user.userName}>
+                            <Button variant="text" value={user.userName} onClick={(e) => {console.log(e.target.value); this.props.handleSelectUser(e.target.value) }}>{user.userName}</Button> 
                             <br></br>
                             </div>
                         );
                     })
-                */}
+                }
             </div>
         );
     }
 }
 
-/*UserList.propTypes = {
+/*Users.propTypes = {
     users: React.PropTypes.array.isRequired
 };*/
 

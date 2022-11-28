@@ -23,6 +23,8 @@ class App extends Component {
             userName: '',
             userPassword: '',
         }
+
+        //console.log(this.props.thisUser);
     }
 
     updateUserName = (value) => {
@@ -37,32 +39,54 @@ class App extends Component {
 
     handleAuth(type) {
 
-        console.log(this.props.thisUser);
         const socket = Singleton.getInstance();
         let messageDto = JSON.stringify({ fromUser: this.state.userName, password: this.state.userPassword, desc: "", type: MessageType.ADD_USER });
 
         socket.send(messageDto);
     }
 
-    handleSend = (message) => {
+    handleMessage = (message) => {
+
+        const socket = Singleton.getInstance();
+        let messageDto = JSON.stringify({ fromUser: this.props.thisUser, toUser: this.props.user, message: message , type: MessageType.TEXT_MESSAGE });
+        socket.send(messageDto);
+        console.log(this.props.thisUser);
+
         this.props.addMessage(this.props.thisUser, this.props.user, message);
+    }
+
+    getFriends = (user) => {
+        const socket = Singleton.getInstance();
+        let messageDto = JSON.stringify({ fromUser: user, type: MessageType.GET_FRIENDS_REQUEST });
+        socket.send(messageDto);
+    }
+
+    handleAddFriend = (user) => {
+        console.log("addfriends", this.props.thisUser);
+        const socket = Singleton.getInstance();
+        let messageDto = JSON.stringify({ fromUser: this.props.thisUser, friends: [{userName: user}] , type: MessageType.ADD_FRIEND_REQUEST });
+        socket.send(messageDto);
+    }
+
+    handleSelectUser = (user) => {
+        this.props.selectUser(user);
     }
 
     componentDidMount() {
     }
 
     render() {
-        const chatNav = this.state.modalOpen ? '' : <ChatNavbar />
-        const users = this.state.modalOpen ? '' : <Users />
-        const chat = this.state.modalOpen ? '' : <Chat handleSend={(message) => this.handleSend(message)} />
+       /* const chatNav = this.state.modalOpen || this.props.thisUser =='' ? '' : 
+        const users = this.state.modalOpen || this.props.thisUser ? '' : 
+        const chat = this.state.modalOpen || this.props.thisUser ? '' :*/ 
         return (
             <div className="App">
-                {chatNav}
+                <ChatNavbar modalOpen={this.state.modalOpen} thisUser={this.props.thisUser} handleAddFriend={(user) => this.handleAddFriend(user)} />
                 <div style={{ float: "left" , paddingRight:"200px" }}>
-                    {users}
+                    <Users modalOpen={this.state.modalOpen} thisUser={this.props.thisUser} userList={this.props.users} handleSelectUser={(user) => this.handleSelectUser(user)}/>
                 </div>
                 <div style={{ float: "right" , paddingRight:"200px" }}>
-                    {chat}
+                    <Chat modalOpen={this.state.modalOpen} thisUser={this.props.thisUser} handleMessage={(message) => this.handleMessage(message)} messages={this.props.messages} selectUser={this.props.user}/>
                 </div>
                 <Dialog
                     modal={true}
@@ -81,7 +105,6 @@ class App extends Component {
 
         console.log("registering socket");
         let self = this;
-        console.log(this.props);
         this.socket = Singleton.getInstance();
 
         this.socket.onmessage = (response) => {
@@ -93,8 +116,8 @@ class App extends Component {
                     self.props.loginFailAck();
                     break;
                 case MessageType.USER_LOGIN_SUCCESSFUL:
-                    console.log(self.props);
                     self.props.loginSuccessAck(message.fromUser.userName);
+                    self.getFriends(message.fromUser.userName);
                     self.setState({ modalOpen: false });
                     break;
                 case MessageType.USER_LOGOUT_FAIL:
@@ -108,6 +131,10 @@ class App extends Component {
                     self.props.messageReceived(message.fromUser.userName, message.toUser.userName, message.message);
                     break;
                 case MessageType.GET_FRIENDS_SUCCESSFUL:
+                    /*let frnds = [];
+                    message.friends.map((data, idx) => (
+                        frnds.append(data.userName)
+                    ));*/
                     self.props.getFriendsSuccessAck(message.friends);
                     break;
                 case MessageType.GET_FRIENDS_FAIL:

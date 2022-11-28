@@ -2,6 +2,7 @@ import React from "react";
 import "../styles.css";
 // import ChatFeed from "react-chat-ui";/
 import { ChatFeed, ChatBubble, BubbleGroup, Message } from "react-chat-ui";
+import { connect } from 'react-redux';
 
 const styles = {
 
@@ -38,32 +39,42 @@ class Chat extends React.Component {
     constructor() {
         super();
 
-        this.state = {
+        /*this.state = {
             messages: [
                 new Message({ id: "Mark", message: "Hey guys!", senderName: "Mark" })
             ]
-        }
+        }*/
 
     }
 
     handleSubmit = (event) => {
         event.preventDefault();
-        console.log(this.message.value, this.props.thisUser);
-        this.setState({
-            messages: [...this.state.messages, new Message({ id: 0, message: this.message.value, senderName: "You" })]
-        });
-        this.props.handleSend(this.message.value);
+        this.props.handleMessage(this.message.value);
         this.message.value = '';
-        console.log(this.props);
     }
 
     render() {
+
+        if(this.props.modalOpen || this.props.thisUser == '' )
+            return null;
+
+        const msgs = this.props.messages.map((message, i) => {
+            if(message.toUser == this.props.thisUser) {
+                return new Message({id: this.props.thisUser, message: message.message, senderName: message.fromUser});
+            }
+            else if(message.fromUser == this.props.thisUser) {
+                return new Message({id: 0, message: message.message, senderName: message.fromUser});
+            }
+        });
+
+        
         return (
-            <div className="container">
+            <div className="container"> 
+                <label> Friend: {this.props.selectUser}</label>
                 <div className="chatfeed-wrapper">
                     <ChatFeed
                         chatBubble={customBubble}
-                        messages={this.state.messages} // Boolean: list of message objects
+                        messages={msgs} // Boolean: list of message objects
                         showSenderName
                         bubblesCentered={false}
                     />
@@ -81,4 +92,11 @@ class Chat extends React.Component {
     }
 }
 
-export default Chat;
+function mapStateToProps(state) {
+    return {
+        messages: state.messages,
+        thisUser: state.thisUser
+    }
+}
+
+export default connect(mapStateToProps)(Chat);

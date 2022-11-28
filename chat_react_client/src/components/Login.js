@@ -7,15 +7,6 @@ class Login extends Component {
 
         event.preventDefault();
         this.props.handleAuth(MessageType.ADD_USER);
-        /*// Prevent page reload
-        event.preventDefault();
-
-        var { uname, pass } = document.forms[0];
-
-        const socket = Singleton.getInstance();
-        let messageDto = JSON.stringify({ user: this.props.thisUser, data: this.state.inputValue, type: MessageType.ADD_USER });
-        socket.send(messageDto);
-        this.setState({ inputValue: '' })*/
 
     };
 

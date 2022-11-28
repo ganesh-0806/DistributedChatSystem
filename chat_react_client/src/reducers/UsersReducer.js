@@ -1,13 +1,14 @@
-export default function (state = [], action) {
+
+export default function (state = [{"userName": "abc"}, {"userName":"def"}], action) {
     switch (action.type) {
-        case 'SELECT_USER':
-            return action.user;
         case 'ADD_FRIEND_SUCCESSFUL':
+            return [state.users, action.user];
         case 'ADD_FRIEND_FAIL':
+            return state.users;
         case 'GET_FRIENDS_SUCCESSFUL':
+            return action.users;
         case 'GET_FRIENDS_FAIL':
-            const us = action.users && action.users.length > 0 ? action.users : [];
-            return us;
+            return state.users
         default:
     }
 
