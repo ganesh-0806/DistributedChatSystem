@@ -1,4 +1,4 @@
-package model;
+package org.distributed.model;
 
 public class UserMessage extends Message{
     private String password;

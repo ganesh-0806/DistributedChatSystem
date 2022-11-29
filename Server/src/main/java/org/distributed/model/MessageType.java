@@ -1,4 +1,4 @@
-package model;
+package org.distributed.model;
 
 public enum MessageType {
 

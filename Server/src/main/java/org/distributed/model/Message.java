@@ -1,6 +1,8 @@
-package model;
+package org.distributed.model;
 
-public class Message {
+import java.io.Serializable;
+
+public class Message implements Serializable {
     private User fromUser;
     private MessageType type;
 
