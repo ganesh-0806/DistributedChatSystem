@@ -1,5 +1,6 @@
 package org.distributed.connector;
 
+import org.distributed.fd.ServerCache;
 import org.distributed.model.*;
 
 import java.io.*;
@@ -30,6 +31,14 @@ public class BalancerHandler implements Runnable {
             //outputStream = (ObjectOutputStream) socket.getOutputStream();
         } catch (UnknownHostException e) {
             throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    void send(Message msg){
+        try {
+            outputStream.writeObject(msg);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -78,13 +87,16 @@ public class BalancerHandler implements Runnable {
                         msg1.setMessageType(ADD_FRIEND_FAIL);
                     }
                     brokerHandler.send(msg1);
-                } else if (msg.getMessageType() == SERVER_JOINED) {
+                }/*// TODO: No need of balancer letting the server know about server adding
+                else if (msg.getMessageType() == SERVER_JOINED) {
                     //TODO: Different message type for server and balancer
                     Message msg1 = (Message) msg;
-                } else if (msg.getMessageType() == SERVER_EXITED) {
+
+                }*/ else if (msg.getMessageType() == SERVER_EXITED) {
                     //TODO: Different message type for server and balancer
-                    Message msg1 = (Message) msg;
-                } else {
+                    ServerCache serverCache = ServerCache.getInstance();
+                    //TODO: remove ip from cache
+                }else {
                     //msg.getMessageType() = GET_FRIENDS_REQUEST
                     FriendMessage msg1 = (FriendMessage) msg;
                     //TODO: Get friends from db
