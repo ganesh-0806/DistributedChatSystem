@@ -1,8 +1,9 @@
 package org.distributed.model;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class User {
+public class User implements Serializable {
     private String userName;
     private Integer userId;
 
