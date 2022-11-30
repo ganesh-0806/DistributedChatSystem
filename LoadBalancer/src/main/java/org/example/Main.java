@@ -10,7 +10,7 @@ public class Main {
         try {
 
             while(true){
-                Socket socket=new Socket("10.0.0.181",8081);
+                Socket socket=new Socket("3.88.145.60",8081);
                 System.out.println("Connected to local client");
             }
         }
