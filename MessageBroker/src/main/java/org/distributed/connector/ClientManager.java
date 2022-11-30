@@ -123,7 +123,7 @@ public class ClientManager extends WebSocketServer {
             else {
                 clientHandler.setWebSocket(webSocket);
             }
-            loadOutputStream.writeObject(userMessage);
+            loadOutputStream.writeObject((Message)userMessage);
             loadOutputStream.flush();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -132,7 +132,7 @@ public class ClientManager extends WebSocketServer {
 
     private void handleFriends(WebSocket webSocket, FriendMessage friendMessage){
         try {
-            loadOutputStream.writeObject(friendMessage);
+            loadOutputStream.writeObject((Message)friendMessage);
             loadOutputStream.flush();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -141,7 +141,7 @@ public class ClientManager extends WebSocketServer {
 
     private void handleConversation(WebSocket webSocket, ChatMessage chatMessage){
         try {
-            loadOutputStream.writeObject(chatMessage);
+            loadOutputStream.writeObject((Message)chatMessage);
             loadOutputStream.flush();
         } catch (IOException e) {
             throw new RuntimeException(e);
