@@ -11,7 +11,7 @@ public class BrokerManager extends Thread{
     private ServerSocket serverSocket;
 
 
-    BrokerManager()
+    public BrokerManager()
     {
         try {
             serverSocket=new ServerSocket(8081);
