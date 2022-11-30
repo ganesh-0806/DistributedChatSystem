@@ -125,6 +125,7 @@ public class LoadBalancer extends Thread {
             String clientUserName;
             try {
                 Message defaultMessage = (Message) inputStream.readObject();
+                System.out.println(defaultMessage);
                 if(defaultMessage==null)
                 {
                     socket.close();
