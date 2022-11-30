@@ -34,7 +34,7 @@ public class LoadBalancer extends Thread {
     public LoadBalancer(Socket socket) {
         this.socket = socket;
         try {
-            this.inputStream = (ObjectInputStream) socket.getInputStream();
+            this.inputStream = new ObjectInputStream(socket.getInputStream());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -154,8 +154,8 @@ public class LoadBalancer extends Thread {
                 ServerHandler destinationServer = serverMapping.get(serverChosen);
                 Socket destination=serverSockets.get(destinationServer);
 
-                DataOutputStream out = new DataOutputStream(destination.getOutputStream());
-                ObjectOutputStream objectOutputStream = new ObjectOutputStream(out);
+                //utputStream out = new DataOutputStream();
+                ObjectOutputStream objectOutputStream = new ObjectOutputStream(destination.getOutputStream());
 
                 objectOutputStream.writeObject(inputStream);
                 System.out.println("Message forwarded to server-" + serverChosen);
