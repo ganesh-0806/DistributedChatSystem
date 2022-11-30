@@ -28,13 +28,13 @@ public class LoadBalancer extends Thread {
     Socket loadBalancerSocket;
     String loadBalancerAddress;
     public static int loadBalancerPort=8081;
-    DataInputStream inputStream;
+    ObjectInputStream inputStream;
     Socket socket;
 
     public LoadBalancer(Socket socket) {
         this.socket = socket;
         try {
-            this.inputStream = (DataInputStream) socket.getInputStream();
+            this.inputStream = (ObjectInputStream) socket.getInputStream();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -121,21 +121,19 @@ public class LoadBalancer extends Thread {
         DataInputStream in = null;
         System.out.println("In loadBalancer's loadProcessing method");
         try {
-            in = new DataInputStream(socket.getInputStream());
-            ObjectInputStream input = new ObjectInputStream(in);
             Message message;
             String clientUserName;
             try {
-                Message defaultMessage = (Message) input.readObject();
+                Message defaultMessage = (Message) inputStream.readObject();
                 if(defaultMessage==null)
                 {
                     socket.close();
                 }
                 if (defaultMessage.type == MessageType.TEXT_MESSAGE) {
-                    message = (ChatMessage) input.readObject();
+                    message = (ChatMessage) inputStream.readObject();
                     clientUserName = ((ChatMessage) message).getToUser().getUserName();
                 } else {
-                    message = (UserMessage) input.readObject();
+                    message = (UserMessage) inputStream.readObject();
                     clientUserName = null;
                 }
 
@@ -159,7 +157,7 @@ public class LoadBalancer extends Thread {
                 DataOutputStream out = new DataOutputStream(destination.getOutputStream());
                 ObjectOutputStream objectOutputStream = new ObjectOutputStream(out);
 
-                objectOutputStream.writeObject(input);
+                objectOutputStream.writeObject(inputStream);
                 System.out.println("Message forwarded to server-" + serverChosen);
 
             } catch (ClassNotFoundException ex) {
