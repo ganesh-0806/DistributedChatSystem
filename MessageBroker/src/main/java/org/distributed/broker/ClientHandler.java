@@ -56,6 +56,7 @@ public class ClientHandler implements Runnable {
 
     public void removeWebSocket() {
         sockLock.lock();
+        this.webSocket.close();
         this.webSocket = null;
         this.state = ClientState.INACTIVE;
         sockLock.unlock();
