@@ -95,7 +95,7 @@ public class ClientManager extends WebSocketServer {
         try {
             //InetAddress host = InetAddress.getByName("54.157.162.179");
              //host = InetAddress.getLocalHost();
-             loadSocket = new Socket("54.157.162.179", 8081);
+             loadSocket = new Socket("52.204.99.182", 8081);
              loadOutputStream = new ObjectOutputStream(loadSocket.getOutputStream());
         } catch (UnknownHostException e) {
             System.out.println("Error at connecting to load balancer");
