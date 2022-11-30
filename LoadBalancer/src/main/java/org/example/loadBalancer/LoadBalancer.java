@@ -8,6 +8,7 @@ import java.net.ServerSocket;
 import java.net.*;
 import java.util.*;
 import java.net.Socket;
+import java.util.concurrent.TimeUnit;
 
 public class LoadBalancer extends Thread {
 
@@ -20,6 +21,7 @@ public class LoadBalancer extends Thread {
     static int id=0;
     HashMap<Integer, ServerHandler> serverMapping;
     HashMap<ServerHandler, Socket> serverSockets;
+    static HashMap<String, Integer> serverStatus;
     LoadBalancer loadBalancer;
     //ArrayList<LoadBalancer> peers;
     ServerSocket serverSocket;
@@ -52,10 +54,27 @@ public class LoadBalancer extends Thread {
         this.loadBalancerPort = port;
     }
 
+    public static void reFreshServerStatus() {
+        for(Map.Entry<String, Integer> server : serverStatus.entrySet()) {
+            String key = server.getKey();
+            serverStatus.put(key,0);
+        }
+    }
+
     public LoadBalancer getLoadBalancer() {
         return loadBalancer;
     }
 
+    public void initiateServerStatus()
+    {
+        serverStatus=new HashMap();
+        for(Map.Entry<Integer, ServerHandler> server : serverMapping.entrySet()) {
+            String key = server.getValue().socketAddress;
+            serverStatus.put(key,0);
+        }
+        ServerHelper serverHelper=new ServerHelper();
+        serverHelper.start();
+    }
     public void setLoadBalancer(int port) {
         loadBalancer = new LoadBalancer(this.loadBalancerAddress, port);
     }
@@ -178,7 +197,13 @@ public class LoadBalancer extends Thread {
             }
             else if(message.getMessageType().equals(MessageType.SERVER_EXITED))
             {
-                shrinkServerMapping(message.getMessageContent());
+                long timeSeconds = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
+                int statusSoFar=serverStatus.get(message.getMessageContent());
+                if(statusSoFar==serverMapping.size()-1) {
+                    shrinkServerMapping(message.getMessageContent());
+                }
+                else
+                    serverStatus.put(message.getMessageContent(),serverStatus.get(message.getMessageContent())+1);
             }
         }
     }
