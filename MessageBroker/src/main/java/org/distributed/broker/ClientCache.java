@@ -21,6 +21,7 @@ public class ClientCache {
 
     private ClientCache() {
         userClientCache = new HashMap<String, ClientHandler>();
+        userClientThreads = new HashMap<String, Thread>();
     }
 
     public void addClient(String userName, ClientHandler client) {
