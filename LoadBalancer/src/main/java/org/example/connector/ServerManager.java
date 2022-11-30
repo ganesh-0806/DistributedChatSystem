@@ -26,10 +26,4 @@ public class ServerManager extends Thread {
 
     }
 
-    public static void main(String args[])
-    {
-        ServerManager serverManager=new ServerManager();
-        serverManager.start();
-    }
-
 }

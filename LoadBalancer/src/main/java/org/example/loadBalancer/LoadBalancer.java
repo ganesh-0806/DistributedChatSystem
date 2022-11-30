@@ -49,9 +49,14 @@ public class LoadBalancer extends Thread {
     {
         this("localhost", 8081);
     }
-    LoadBalancer(String address, int port) {
+    public LoadBalancer(String address, int port) {
         this.loadBalancerAddress = address;
         this.loadBalancerPort = port;
+        try {
+            socket=new Socket(address, port);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static void reFreshServerStatus() {
@@ -114,14 +119,18 @@ public class LoadBalancer extends Thread {
 
     public void loadProcessing(Socket socket) {
         DataInputStream in = null;
+        System.out.println("In loadBalancer's loadProcessing method");
         try {
             in = new DataInputStream(socket.getInputStream());
             ObjectInputStream input = new ObjectInputStream(in);
-
             Message message;
             String clientUserName;
             try {
                 Message defaultMessage = (Message) input.readObject();
+                if(defaultMessage==null)
+                {
+                    socket.close();
+                }
                 if (defaultMessage.type == MessageType.TEXT_MESSAGE) {
                     message = (ChatMessage) input.readObject();
                     clientUserName = ((ChatMessage) message).getToUser().getUserName();
@@ -130,8 +139,9 @@ public class LoadBalancer extends Thread {
                     clientUserName = null;
                 }
 
+                System.out.println("client is:"+ clientUserName);
+                System.out.println("Message type:"+defaultMessage.type);
 
-                System.out.println(clientUserName);
 
                 //sending messages from loadBalancer to any specific server;
                 int serverChosen=0;
@@ -167,7 +177,7 @@ public class LoadBalancer extends Thread {
             loadProcessing(this.socket);
         }
     }
-
+/*
     public static void main(String args[]) {
         LoadBalancer loadBalancer = null;
 
@@ -179,7 +189,7 @@ public class LoadBalancer extends Thread {
         }
         loadBalancer.start();
     }
-
+*/
     public int generateHash(String clientName) {
         int sum = 0;
         for (int i = 0; i < clientName.length(); i++) {

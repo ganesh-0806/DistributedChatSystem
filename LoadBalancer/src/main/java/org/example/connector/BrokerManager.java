@@ -11,15 +11,21 @@ public class BrokerManager extends Thread{
     private ServerSocket serverSocket;
     private Socket socket;
 
-    @Override
+
     public void run() {
         while (true) {
             try {
-                serverSocket=new ServerSocket(8080);
+                serverSocket=new ServerSocket(8081);
                 socket = serverSocket.accept();
                 LoadBalancer loadBalancer=new LoadBalancer(socket);
                 loadBalancer.start();
             } catch (IOException e) {
+                try {
+                    serverSocket.close();
+                    socket.close();
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
                 System.out.println("I/O error: " + e);
             }
             // new thread for a client
