@@ -8,16 +8,17 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("Hello world!");
         try {
-            ServerSocket server = new ServerSocket(8081);
-            while(true)
-            {
-                System.out.println("Starting up");
-                server.accept();
-                System.out.println("Accepted");
+
+            while(true){
+                Socket socket=new Socket("10.0.0.181",8081);
+                System.out.println("Connected to local client");
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
+        catch(Exception e)
+        {
+            System.out.println(e);
+        }
+
 
     }
 }
