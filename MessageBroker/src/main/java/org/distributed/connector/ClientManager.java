@@ -97,9 +97,9 @@ public class ClientManager extends WebSocketServer {
              loadSocket = new Socket(host, 9876);
              loadOutputStream = (ObjectOutputStream) loadSocket.getOutputStream();
         } catch (UnknownHostException e) {
-            throw new RuntimeException(e);
+            System.out.println("Error at connecting to load balancer");
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println("Error at retrieving the output stream");
         }
 
     }

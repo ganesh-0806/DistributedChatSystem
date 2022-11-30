@@ -1,0 +1,14 @@
+org\distributed\model\User.class
+org\distributed\model\Message.class
+org\distributed\model\FriendMessage.class
+org\distributed\connector\ServerManager.class
+org\distributed\model\UserMessage.class
+org\distributed\model\MessageType.class
+org\distributed\connector\ClientManager$1.class
+org\distributed\broker\ClientCache.class
+org\distributed\broker\ClientHandler.class
+org\distributed\model\ChatMessage.class
+org\distributed\connector\ClientManager.class
+org\distributed\broker\ClientState.class
+org\distributed\broker\ServerHandler.class
+org\distributed\Main.class
