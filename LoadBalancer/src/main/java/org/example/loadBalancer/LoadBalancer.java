@@ -126,6 +126,7 @@ public class LoadBalancer extends Thread {
             try {
                 System.out.println("Reading message");
                 Message defaultMessage = (Message) inputStream.readObject();
+                System.out.println("Message type:"+defaultMessage.getFromUser().getUserName());
                 System.out.println("Message -"+defaultMessage);
                 if(defaultMessage==null)
                 {
