@@ -27,7 +27,7 @@ public class LoadBalancer extends Thread {
     ServerSocket serverSocket;
     Socket loadBalancerSocket;
     String loadBalancerAddress;
-    int loadBalancerPort;
+    public static int loadBalancerPort;
     DataInputStream inputStream;
     Socket socket;
 

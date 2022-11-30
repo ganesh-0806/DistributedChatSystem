@@ -17,7 +17,7 @@ public class ServerManager extends Thread {
     public void run()
     {
         try {
-            loadServerSocket=new ServerSocket(loadBalancer.getLoadBalancerPort());
+            loadServerSocket=new ServerSocket(LoadBalancer.loadBalancerPort);
             loadSocket= loadServerSocket.accept();
             new ServerHandler(loadSocket).start();
         } catch (IOException e) {
