@@ -19,7 +19,7 @@ public class ServerHandler implements Runnable{
         ObjectInputStream inp = null;
         Message msg;
         try {
-            inp = (ObjectInputStream) socket.getInputStream();
+            inp = new ObjectInputStream(socket.getInputStream());
             // TODO: verify if this gives messgase class
             msg = (Message) inp.readObject();
         } catch (IOException e) {
