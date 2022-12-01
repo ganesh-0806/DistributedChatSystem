@@ -13,4 +13,4 @@ The Load Balancer receives messages from Message Broker upon user submitting his
 2. Install the maven dependencies and create jar executable file for the project using: <br>
     maven clean package command
 3. Navigate to the target folder and execute the jar file using the command <br>
-    java -jar <name-of-jar-file>.jar
+    java -jar \<name-of-jar-file\>.jar
