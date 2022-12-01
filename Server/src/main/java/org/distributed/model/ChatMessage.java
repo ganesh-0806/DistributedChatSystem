@@ -3,6 +3,7 @@ package org.distributed.model;
 public class ChatMessage extends Message{
     private User toUser;
     private String message;
+    private static final long serialVersionUID = 4L;
 
     ChatMessage(User from, User to, String msg, MessageType type) {
         super(from, type);
@@ -10,7 +11,7 @@ public class ChatMessage extends Message{
         message = msg;
     }
 
-    public ChatMessage() {
+    ChatMessage() {
         super();
 
     }

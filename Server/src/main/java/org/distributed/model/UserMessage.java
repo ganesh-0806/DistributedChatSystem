@@ -3,14 +3,12 @@ package org.distributed.model;
 public class UserMessage extends Message{
     private String password;
     private String desc;
-
-    private User user;
+    private static final long serialVersionUID = 5L;
 
     UserMessage(User user, String password, String desc, MessageType type) {
         super(user, type);
         this.password = password;
         this.desc = desc;
-        this.user = user;
     }
 
     public void setPassword(String password) {
@@ -27,9 +25,5 @@ public class UserMessage extends Message{
 
     public String getDescription() {
         return this.desc;
-    }
-
-    public User getUser() {
-        return this.user;
     }
 }

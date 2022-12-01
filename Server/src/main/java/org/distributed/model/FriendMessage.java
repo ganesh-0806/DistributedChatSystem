@@ -1,28 +1,39 @@
 package org.distributed.model;
 
+
 import java.util.ArrayList;
 
-public class FriendMessage extends Message{
+public class FriendMessage extends Message {
     private ArrayList<User> friends;
-    private String errDesc;
+    private String desc;
+    private static final long serialVersionUID = 3L;
 
     public FriendMessage(User from, MessageType type){
         super(from, type);
         friends = new ArrayList<User>();
     }
 
+    public FriendMessage(User from, ArrayList<User> friends, MessageType type){
+        super(from, type);
+        this.friends = new ArrayList<User>(friends);
+    }
+
     public FriendMessage(User from, String desc, MessageType type){
         super(from, type);
-        this.errDesc = desc;
+        this.desc = desc;
         friends = new ArrayList<User>();
     }
 
-    public void setErrDesc(String errDesc) {
-        this.errDesc = errDesc;
+    public FriendMessage(){
+        super();
     }
 
-    public String getErrDesc() {
-        return this.errDesc;
+    public void setDesc(String errDesc) {
+        this.desc = errDesc;
+    }
+
+    public String getDesc() {
+        return this.desc;
     }
 
     public void setFriends(ArrayList<User> friends) {

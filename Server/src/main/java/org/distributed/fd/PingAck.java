@@ -2,6 +2,8 @@ package org.distributed.fd;
 
 import org.distributed.connector.BalancerHandler;
 import org.distributed.connector.BrokerHandler;
+import org.distributed.model.MessageType;
+import org.distributed.model.ServerMessage;
 
 import java.io.IOException;
 import java.net.*;
@@ -36,8 +38,13 @@ public class PingAck implements Runnable{
                 // Time difference greater than 5 seconds send loader the fault detection
                 if(timeSeconds - value > 5) {
                     //TODO: send SERVER_EXITED info to balancer
-
+                    balancerHandler.send(new ServerMessage(key, MessageType.SERVER_EXITED));
                 }
+            }
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
         }
     }

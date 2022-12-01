@@ -6,7 +6,7 @@ import org.distributed.fd.PingAck;
 public class Main {
     public static void main(String[] args) {
         // Start Server Manager
-        BalancerHandler balancerHandler = new BalancerHandler(8888);
+        BalancerHandler balancerHandler = new BalancerHandler(9091);
         new Thread(balancerHandler).start();
 
         // Start ping acknowledger

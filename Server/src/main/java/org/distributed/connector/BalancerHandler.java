@@ -2,6 +2,7 @@ package org.distributed.connector;
 
 import org.distributed.fd.ServerCache;
 import org.distributed.model.*;
+import org.distributed.db.*;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -18,15 +19,17 @@ public class BalancerHandler implements Runnable {
     private ObjectOutputStream outputStream;
     private int port;
     private BrokerHandler brokerHandler;
+    MongoConnection mongoConnection;
 
     public BalancerHandler(int port) {
         InetAddress host;
         this.port = port;
         try {
+            mongoConnection= MongoConnection.getInstance();
             host = InetAddress.getLocalHost();
             socket = new Socket(host, this.port);
-            inputStream = (ObjectInputStream) socket.getInputStream();
-            outputStream = (ObjectOutputStream) socket.getOutputStream();
+            inputStream = new ObjectInputStream(socket.getInputStream());
+            outputStream = new ObjectOutputStream (socket.getOutputStream());
             this.brokerHandler = BrokerHandler.getInstance();
             //outputStream = (ObjectOutputStream) socket.getOutputStream();
         } catch (UnknownHostException e) {
@@ -36,7 +39,7 @@ public class BalancerHandler implements Runnable {
         }
     }
 
-    void send(Message msg){
+    public void send(Message msg){
         try {
             outputStream.writeObject(msg);
         } catch (IOException e) {
@@ -63,46 +66,49 @@ public class BalancerHandler implements Runnable {
                     //1. check if user exists in db
                     //if no, add user and return USER_LOGIN_SUCCESSFUL
                     //else, return USER_LOGIN_FAIL
-                    if (db.contains(msg1.getUser().getUserName())) {
-                        if(db.check(msg1.getUser().getUserName(), msg1.getPassword())) {
+                    boolean userExists = false;
+                    if (mongoConnection.isUserExists(msg.getFromUser().getUserName())) {
+                        if (mongoConnection.isUserValid(msg.getFromUser().getUserName(), msg1.getPassword())) {
+                            msg1.setPassword("");
                             msg1.setMessageType(USER_LOGIN_SUCCESSFUL);
-                        }
-                        else {
+                        } else {
+                            msg1.setPassword("");
+                            msg1.setDescription("No such user exists");
                             msg1.setMessageType(USER_LOGIN_FAIL);
                         }
                     } else {
-                        // TODO: insert in db
+                        //TODO: Assuming this wont fail
+                        mongoConnection.addUser(msg1.getFromUser().getUserName(), msg1.getPassword());
                         msg1.setMessageType(USER_LOGIN_SUCCESSFUL);
+                        msg1.setPassword("");
                     }
                     brokerHandler.send(msg1);
-                } else if (msg.getMessageType() == ADD_FRIEND_REQUEST) {
+                }
+                else if (msg.getMessageType() == ADD_FRIEND_REQUEST) {
                     FriendMessage msg1 = (FriendMessage) msg;
                     User user2 = msg1.getFriends().get(0);
-                    //1. check if user has the friend added already
-                    //if no, add user to friend list and return ADD_FRIEND_SUCCESSFUL msg
-                    //else, return ADD_FRIEND_FAIL msg
-                    if (db.add(msg1.getFromUser().getUserName(), user2.getUserName())) {
-                        msg1.setMessageType(ADD_FRIEND_SUCCESSFUL);
-                    } else {
-                        msg1.setMessageType(ADD_FRIEND_FAIL);
-                    }
-                    brokerHandler.send(msg1);
-                }/*// TODO: No need of balancer letting the server know about server adding
-                else if (msg.getMessageType() == SERVER_JOINED) {
-                    //TODO: Different message type for server and balancer
-                    Message msg1 = (Message) msg;
 
-                }*/ else if (msg.getMessageType() == SERVER_EXITED) {
-                    //TODO: Different message type for server and balancer
+                    if(mongoConnection.isUserExists(msg1.getFromUser().getUserName()) && mongoConnection.isUserExists(user2.getUserName())) {
+                        mongoConnection.addFriend(msg1.getFromUser().getUserName(), user2.getUserName());
+                        msg1.setMessageType(ADD_FRIEND_SUCCESSFUL);
+                    }
+                    else {
+                        msg1.setMessageType(ADD_FRIEND_FAIL);
+                        msg1.setDesc("User does not exist");
+                    }
+
+                    brokerHandler.send(msg1);
+                } else if (msg.getMessageType() == SERVER_EXITED) {
                     ServerCache serverCache = ServerCache.getInstance();
-                    //TODO: remove ip from cache
+                    ServerMessage msg1 = (ServerMessage) msg;
+                    serverCache.removeIp(msg1.getMessageContent());
                 }else {
                     //msg.getMessageType() = GET_FRIENDS_REQUEST
                     FriendMessage msg1 = (FriendMessage) msg;
                     //TODO: Get friends from db
-                    ArrayList<String> frnds = db.getFriends(msg1.getFromUser().getUserName());
-                    for (String f : frnds) {
-                        msg1.addFriend(new User(f));
+                    ArrayList<User> friends = mongoConnection.retrieveFriends(msg1.getFromUser().getUserName());
+                    for (User f : friends) {
+                        msg1.addFriend(f);
                     }
                     brokerHandler.send(msg1);
                 }

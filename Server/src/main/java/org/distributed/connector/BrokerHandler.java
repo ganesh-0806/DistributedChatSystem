@@ -24,8 +24,8 @@ public class BrokerHandler {
     BrokerHandler() {
         try{
             InetAddress host = InetAddress.getLocalHost();
-            socket = new Socket(host, 7777);
-            brokerOutputStream = (ObjectOutputStream)socket.getOutputStream();
+            socket = new Socket(host, 8888);
+            brokerOutputStream = new ObjectOutputStream (socket.getOutputStream());
         } catch (UnknownHostException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {

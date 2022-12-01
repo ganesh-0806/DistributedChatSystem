@@ -4,14 +4,15 @@ import java.io.Serializable;
 
 public class Message implements Serializable {
     private User fromUser;
-    private MessageType type;
+    public MessageType type;
+    private static final long serialVersionUID = 1L;
 
     Message(User user, MessageType type){
         this.fromUser = user;
         this.type = type;
     }
 
-    public Message() {
+    Message() {
 
     }
 
