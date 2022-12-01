@@ -14,6 +14,7 @@ import java.io.Serializable;
 public class Message implements Serializable {
     private User fromUser;
     private MessageType type;
+    private static final long serialVersionUID = 1L;
 
     public Message(User user, MessageType type){
         this.fromUser = user;
@@ -39,4 +40,5 @@ public class Message implements Serializable {
     public MessageType getType() {
         return this.type;
     }
+
 }

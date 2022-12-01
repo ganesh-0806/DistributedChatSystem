@@ -11,6 +11,7 @@ import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
@@ -95,8 +96,12 @@ public class ClientManager extends WebSocketServer {
         try {
             //InetAddress host = InetAddress.getByName("54.157.162.179");
              //host = InetAddress.getLocalHost();
-             loadSocket = new Socket("100.25.204.112", 8081);
-             loadOutputStream = new ObjectOutputStream(loadSocket.getOutputStream());
+             loadSocket = new Socket("127.0.0.1", 8081);
+             System.out.println(loadSocket.isConnected());
+             loadOutputStream = new ObjectOutputStream(new DataOutputStream(loadSocket.getOutputStream()));
+             Message msg = new UserMessage(new User("temp"), MessageType.ADD_USER);
+             loadOutputStream.writeObject(msg);
+             loadOutputStream.flush();
         } catch (UnknownHostException e) {
             System.out.println("Error at connecting to load balancer");
         } catch (IOException e) {
@@ -123,7 +128,7 @@ public class ClientManager extends WebSocketServer {
             else {
                 clientHandler.setWebSocket(webSocket);
             }
-            loadOutputStream.writeObject((Message)userMessage);
+            loadOutputStream.writeObject(userMessage);
             loadOutputStream.flush();
         } catch (IOException e) {
             throw new RuntimeException(e);
