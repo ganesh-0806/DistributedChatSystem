@@ -5,10 +5,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ChatMessage extends Message implements Serializable {
+public class ChatMessage extends Message {
     private User toUser;
     private String message;
-
+    private static final long serialVersionUID = 4L;
     public ChatMessage(User from, User to, String msg, MessageType type) {
         super(from, type);
         toUser = to;

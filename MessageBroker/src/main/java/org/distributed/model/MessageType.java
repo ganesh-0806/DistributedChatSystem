@@ -2,6 +2,8 @@ package org.distributed.model;
 
 import com.fasterxml.jackson.annotation.*;
 
+import java.io.Serializable;
+
 //@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 //@JsonIgnoreProperties(ignoreUnknown = true)
 public enum MessageType {

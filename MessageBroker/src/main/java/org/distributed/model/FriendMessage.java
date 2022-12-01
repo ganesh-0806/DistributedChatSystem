@@ -6,9 +6,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class FriendMessage extends Message implements Serializable {
+public class FriendMessage extends Message {
     private ArrayList<User> friends;
     private String desc;
+    private static final long serialVersionUID = 3L;
 
     public FriendMessage(User from, MessageType type){
         super(from, type);
