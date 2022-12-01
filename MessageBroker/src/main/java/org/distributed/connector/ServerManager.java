@@ -30,7 +30,7 @@ public class ServerManager implements Runnable{
                 System.out.println("I/O error: " + e);
             }
             // new thread for a client
-            new Thread(new ServerHandler(socket)).start();
+            new Thread(new ServerHandler(socket)).start(); 
         }
     }
 }
