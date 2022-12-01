@@ -43,26 +43,16 @@ public class ClientManager extends WebSocketServer {
         //System.out.println("Message received" + request);
         // TODO: pass it as serialized string stream
         ObjectMapper mapper = new ObjectMapper();
-        //UserMessage ab = new UserMessage(new User("ab"), "ab", MessageType.ADD_USER);
-
-        //String temp = "{\"fromUser\":\"abc\",\"password\":\"abc\",\"type\":\"ADD_USER\"}";
 
         try {
-            //System.out.println(mapper.writeValueAsString(ab));
-            //TODO: verify json to object conversion
-            //MessageType abc = mapper.readValue(temp, MessageType.class);
             System.out.println("Message received" + request);
             Message msg = mapper.readValue(request, Message.class);
-            //UserMessage abcmsg = mapper.readValue(request, UserMessage.class);
-            System.out.println("Message received  as ");
-            System.out.println(msg.getFromUser().getUserName() + " " + msg.getType());
             UserMessage userMsg;
             ChatMessage chatMsg;
             FriendMessage friendMsg;
             switch (msg.getType()) {
                 case ADD_USER:
                 case USER_LOGOUT:
-                    System.out.println("In  Switch" + request);
                     userMsg = mapper.readValue(request, UserMessage.class);;
                     handleAuth(webSocket, userMsg);
                     break;
@@ -91,17 +81,12 @@ public class ClientManager extends WebSocketServer {
     public void onStart() {
         System.out.println("Web Server Socket started...");
 
-        //TODO: Get the load balancer IP
-
         try {
             //InetAddress host = InetAddress.getByName("54.157.162.179");
              //host = InetAddress.getLocalHost();
              loadSocket = new Socket("100.25.204.112", 8081);
              System.out.println(loadSocket.isConnected());
              loadOutputStream = new ObjectOutputStream(new DataOutputStream(loadSocket.getOutputStream()));
-             Message msg = new UserMessage(new User("temp"), MessageType.ADD_USER);
-             loadOutputStream.writeObject(msg);
-             loadOutputStream.flush();
         } catch (UnknownHostException e) {
             System.out.println("Error at connecting to load balancer");
         } catch (IOException e) {
@@ -112,12 +97,6 @@ public class ClientManager extends WebSocketServer {
 
     private void handleAuth(WebSocket webSocket, UserMessage userMessage){
         System.out.println(" in Auth" + userMessage.getFromUser().getUserName() + " " + userMessage.getPassword());
-        /*ObjectMapper mapper = new ObjectMapper();
-        try {
-            webSocket.send(mapper.writeValueAsString(new UserMessage(userMessage.getFromUser(), "", "", MessageType.USER_LOGIN_SUCCESSFUL)));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }*/
         try {
             ClientCache clientCache = ClientCache.getInstance();
             ClientHandler clientHandler = clientCache.getClient(userMessage.getFromUser().getUserName());
@@ -137,7 +116,7 @@ public class ClientManager extends WebSocketServer {
 
     private void handleFriends(WebSocket webSocket, FriendMessage friendMessage){
         try {
-            loadOutputStream.writeObject((Message)friendMessage);
+            loadOutputStream.writeObject(friendMessage);
             loadOutputStream.flush();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -146,7 +125,7 @@ public class ClientManager extends WebSocketServer {
 
     private void handleConversation(WebSocket webSocket, ChatMessage chatMessage){
         try {
-            loadOutputStream.writeObject((Message)chatMessage);
+            loadOutputStream.writeObject(chatMessage);
             loadOutputStream.flush();
         } catch (IOException e) {
             throw new RuntimeException(e);

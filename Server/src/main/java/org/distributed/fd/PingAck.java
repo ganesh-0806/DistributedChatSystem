@@ -68,10 +68,13 @@ public class PingAck implements Runnable{
                 byte[] receiveData = new byte[8];
                 DatagramPacket receivePacket = new DatagramPacket(receiveData,
                         receiveData.length);
-                if(serverCache.isIpExists(receivePacket.getAddress().toString()) == false) {
-                    //TODO: send server joined message to balancer
+
+                if(receivePacket.getAddress() != null) {
+                    if (serverCache.isIpExists(receivePacket.getAddress().toString()) == false) {
+                        //TODO: send server joined message to balancer
+                    }
+                    serverCache.addIp(receivePacket.getAddress().toString());
                 }
-                serverCache.addIp(receivePacket.getAddress().toString());
             }
         }
     }

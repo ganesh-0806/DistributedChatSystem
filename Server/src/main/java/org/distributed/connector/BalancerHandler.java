@@ -19,7 +19,7 @@ public class BalancerHandler implements Runnable {
     private ObjectOutputStream outputStream;
     private int port;
     private BrokerHandler brokerHandler;
-    MongoConnection mongoConnection;
+    private MongoConnection mongoConnection;
 
     public BalancerHandler(int port) {
         InetAddress host;
@@ -52,8 +52,10 @@ public class BalancerHandler implements Runnable {
         while (true) {
             //TODO: typecast read input into message
             try {
+                System.out.println("Before read");
                 msg = (Message) inputStream.readObject();
-
+                System.out.println("After read ");
+                System.out.println(msg);
                 if (msg.getMessageType() == TEXT_MESSAGE) {
                     ChatMessage msg1 = (ChatMessage) msg;
                     brokerHandler.send(msg1);

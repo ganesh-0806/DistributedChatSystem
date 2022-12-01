@@ -40,6 +40,7 @@ public class ServerHandler extends Thread {
     private void readMessage(Socket socket) {
         try {
             ois=new ObjectInputStream(socket.getInputStream());
+
             ServerMessage serverMessage=(ServerMessage) ois.readObject();
             ServerCache.getInstance().heartBeatListener(serverMessage, socket.getInetAddress().getHostAddress());
         } catch (IOException e) {

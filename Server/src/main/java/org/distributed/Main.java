@@ -8,6 +8,7 @@ public class Main {
         // Start Server Manager
         BalancerHandler balancerHandler = new BalancerHandler(9091);
         new Thread(balancerHandler).start();
+        System.out.println("Balancer thread started");
 
         // Start ping acknowledger
         PingAck pingAck = new PingAck(balancerHandler);

@@ -1,5 +1,6 @@
 package org.distributed.db;
 
+import com.mongodb.MongoClientOptions;
 import com.mongodb.client.*;
 import com.mongodb.client.MongoClient;
 import org.bson.Document;
@@ -8,6 +9,7 @@ import org.distributed.model.User;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 public class MongoConnection {
     static MongoConnection instance;
@@ -19,6 +21,7 @@ public class MongoConnection {
         String connectionString="mongodb://34.227.7.28:27017";
         try (MongoClient mongoClient = (MongoClient) MongoClients.create(connectionString)) {
             databaseObject = mongoClient.getDatabase(database);
+            System.out.println("Db object created");
         }
         catch (Exception e)
         {
@@ -35,13 +38,14 @@ public class MongoConnection {
 
     public boolean isUserExists(String username) {
         MongoCollection<Document> collection=databaseObject.getCollection("personalInfo");
-        FindIterable<Document> iterDoc = collection.find();
-        Iterator it = iterDoc.iterator();
+        //FindIterable<Document> iterDoc = collection.find();
+
+        List<Document> docList = collection.find().into(new ArrayList<>());
+        //Iterator it = iterDoc.iterator();
         HashMap<String,String> users=new HashMap<>();
-        while (it.hasNext()) {
-            Document doc= (Document) it.next();
-            System.out.println(doc);
-            String uname=doc.getString("username");
+        for(Document document: docList) {
+            //System.out.println(doc);
+            String uname=document.getString("username");
             if(uname == username) {
                 return true;
             }
