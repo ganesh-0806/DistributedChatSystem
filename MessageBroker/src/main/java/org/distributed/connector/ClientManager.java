@@ -96,7 +96,7 @@ public class ClientManager extends WebSocketServer {
         try {
             //InetAddress host = InetAddress.getByName("54.157.162.179");
              //host = InetAddress.getLocalHost();
-             loadSocket = new Socket("127.0.0.1", 8081);
+             loadSocket = new Socket("100.25.204.112", 8081);
              System.out.println(loadSocket.isConnected());
              loadOutputStream = new ObjectOutputStream(new DataOutputStream(loadSocket.getOutputStream()));
              Message msg = new UserMessage(new User("temp"), MessageType.ADD_USER);
