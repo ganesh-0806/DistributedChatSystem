@@ -19,6 +19,7 @@ class ChatNavbar extends Component {
 
     updateFriend(event) {
         event.preventDefault()
+        console.log(event.target.value);
         this.setState({friend: event.target.value});
     }
 

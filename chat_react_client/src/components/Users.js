@@ -8,7 +8,7 @@ class Users extends React.Component {
     }
     render() {
 
-        if(this.props.modalOpen || this.props.thisUser == '' )
+        if(this.props.modalOpen || this.props.thisUser == '' || this.props.userList == null)
             return null;
 
         return (

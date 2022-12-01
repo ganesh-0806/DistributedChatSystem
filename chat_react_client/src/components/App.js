@@ -48,16 +48,19 @@ class App extends Component {
     handleMessage = (message) => {
 
         const socket = Singleton.getInstance();
+        console.log(message);
+        console.log(this.props.user);
+        this.props.addMessage(this.props.thisUser, this.props.user, message);
         let messageDto = JSON.stringify({ fromUser: this.props.thisUser, toUser: this.props.user, message: message , type: MessageType.TEXT_MESSAGE });
         socket.send(messageDto);
         console.log(this.props.thisUser);
 
-        this.props.addMessage(this.props.thisUser, this.props.user, message);
+        
     }
 
     getFriends = (user) => {
         const socket = Singleton.getInstance();
-        let messageDto = JSON.stringify({ fromUser: user, type: MessageType.GET_FRIENDS_REQUEST });
+        let messageDto = JSON.stringify({ fromUser: user, friends: [], type: MessageType.GET_FRIENDS_REQUEST });
         socket.send(messageDto);
     }
 
@@ -111,6 +114,8 @@ class App extends Component {
             let message = JSON.parse(response.data);
             let users;
 
+            console.log("On message response");
+            console.log(message);
             switch (message.type) {
                 case MessageType.USER_LOGIN_FAIL:
                     self.props.loginFailAck();
@@ -155,7 +160,7 @@ class App extends Component {
         }
 
         window.onbeforeunload = () => {
-            let messageDto = JSON.stringify({ fromUser: this.state.userName, type: MessageType.USER_LOGOUT });
+            let messageDto = JSON.stringify({ fromUser: this.state.userName, password: "", type: MessageType.USER_LOGOUT });
             this.socket.send(messageDto);
         }
     }

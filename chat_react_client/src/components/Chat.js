@@ -49,6 +49,7 @@ class Chat extends React.Component {
 
     handleSubmit = (event) => {
         event.preventDefault();
+        console.log(this.message.value);
         this.props.handleMessage(this.message.value);
         this.message.value = '';
     }
@@ -58,14 +59,19 @@ class Chat extends React.Component {
         if(this.props.modalOpen || this.props.thisUser == '' )
             return null;
 
-        const msgs = this.props.messages.map((message, i) => {
-            if(message.toUser == this.props.thisUser) {
-                return new Message({id: this.props.thisUser, message: message.message, senderName: message.fromUser});
-            }
-            else if(message.fromUser == this.props.thisUser) {
-                return new Message({id: 0, message: message.message, senderName: message.fromUser});
-            }
-        });
+        var msgs = [];
+        
+        if(this.props.messages != null) {
+            console.log(this.props.user);
+            msgs = this.props.messages.map((message, i) => {
+                if(message.toUser == this.props.thisUser) {
+                    return new Message({id: this.props.thisUser, message: message.message, senderName: message.fromUser});
+                }
+                else if(message.fromUser == this.props.thisUser) {
+                    return new Message({id: 0, message: message.message, senderName: message.fromUser});
+                }
+            });
+        }
 
         
         return (
@@ -95,7 +101,8 @@ class Chat extends React.Component {
 function mapStateToProps(state) {
     return {
         messages: state.messages,
-        thisUser: state.thisUser
+        thisUser: state.thisUser,
+        user: state.user
     }
 }
 

@@ -1,5 +1,5 @@
 
-export default function (state = [{"userName": "abc"}, {"userName":"def"}], action) {
+export default function (state = null, action) {
     switch (action.type) {
         case 'ADD_FRIEND_SUCCESSFUL':
             return [state.users, action.user];

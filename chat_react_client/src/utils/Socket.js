@@ -3,8 +3,8 @@ import {w3cwebsocket as W3CWebSocket} from "websocket";
 const AppConfig = {
     PROTOCOL: "ws:",
     // TODO: change to localhost if you wish to run it locally
-    //HOST: "//serene-wave-94653.herokuapp.com",
-    HOST: "//localhost",
+    //HOST: "//serene-wave-94653.herokuapp.com",100.26.218.146
+    HOST: "//54.85.133.117",
     PORT: ":5678"
 }
 
