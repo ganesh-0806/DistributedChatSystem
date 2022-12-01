@@ -47,21 +47,23 @@ public class ClientManager extends WebSocketServer {
         try {
             System.out.println("Message received" + request);
             Message msg = mapper.readValue(request, Message.class);
+            System.out.println("Message received 2" + msg);
             UserMessage userMsg;
             ChatMessage chatMsg;
             FriendMessage friendMsg;
             switch (msg.getType()) {
                 case ADD_USER:
                 case USER_LOGOUT:
-                    userMsg = mapper.readValue(request, UserMessage.class);;
+                    userMsg = mapper.readValue(request, UserMessage.class);
                     handleAuth(webSocket, userMsg);
                     break;
                 case ADD_FRIEND_REQUEST:
                 case GET_FRIENDS_REQUEST:
-                    friendMsg = mapper.readValue(request, FriendMessage.class);;
+                    friendMsg = mapper.readValue(request, FriendMessage.class);
                     handleFriends(webSocket, friendMsg);
+                    break;
                 case TEXT_MESSAGE:
-                    chatMsg = mapper.readValue(request, ChatMessage.class);;;
+                    chatMsg = mapper.readValue(request, ChatMessage.class);
                     handleConversation(webSocket, chatMsg);
                     break;
             }
@@ -83,10 +85,10 @@ public class ClientManager extends WebSocketServer {
 
         try {
             //InetAddress host = InetAddress.getByName("54.157.162.179");
-             //host = InetAddress.getLocalHost();
-             loadSocket = new Socket("100.25.204.112", 8081);
+             //host = InetAddress.getLocalHost();100.25.204.112
+             loadSocket = new Socket("127.0.0.1", 8081);
              System.out.println(loadSocket.isConnected());
-             loadOutputStream = new ObjectOutputStream(new DataOutputStream(loadSocket.getOutputStream()));
+             loadOutputStream = new ObjectOutputStream(loadSocket.getOutputStream());
         } catch (UnknownHostException e) {
             System.out.println("Error at connecting to load balancer");
         } catch (IOException e) {
@@ -109,6 +111,7 @@ public class ClientManager extends WebSocketServer {
             }
             loadOutputStream.writeObject(userMessage);
             loadOutputStream.flush();
+            loadOutputStream.reset();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -118,6 +121,7 @@ public class ClientManager extends WebSocketServer {
         try {
             loadOutputStream.writeObject(friendMessage);
             loadOutputStream.flush();
+            loadOutputStream.reset();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -127,6 +131,7 @@ public class ClientManager extends WebSocketServer {
         try {
             loadOutputStream.writeObject(chatMessage);
             loadOutputStream.flush();
+            loadOutputStream.reset();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -20,11 +20,6 @@ public class LoadBalancer extends Thread {
 
     public LoadBalancer(Socket socket) {
         this.socket = socket;
-        try {
-            this.inputStream = new ObjectInputStream(new DataInputStream(socket.getInputStream()));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
 
@@ -33,6 +28,7 @@ public class LoadBalancer extends Thread {
         System.out.println("In loadBalancer's loadProcessing method");
         String clientUserName;
         try {
+
             System.out.println("Reading message");
             Message defaultMessage = (Message) inputStream.readObject();
             System.out.println("Message type:"+defaultMessage.getFromUser().getUserName());
@@ -43,18 +39,10 @@ public class LoadBalancer extends Thread {
             }
 
             clientUserName = defaultMessage.getFromUser().getUserName();
-            /*if (defaultMessage.type == MessageType.TEXT_MESSAGE) {
-                ChatMessage message = (ChatMessage) defaultMessage;
-                clientUserName = message.getToUser().getUserName();
-            } else {
-                UserMessage message = (UserMessage) defaultMessage;
-                clientUserName = null;
-            }*/
 
             //sending messages from loadBalancer to any specific server;
             int serverChosen=0;
             HashMap<Integer, ServerHandler> mapping = ServerCache.getInstance().getServerMapping();
-            HashMap<ServerHandler, Socket> serverSockets = ServerCache.getInstance().getServerSockets();
             if(clientUserName==null)
             {
                 Random randomServerMap=new Random();
@@ -64,11 +52,9 @@ public class LoadBalancer extends Thread {
                 serverChosen = generateHash(clientUserName);
             }
             ServerHandler destinationServer = mapping.get(serverChosen);
-            Socket destination = serverSockets.get(destinationServer);
 
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(destination.getOutputStream());
+            destinationServer.send(defaultMessage);
 
-            objectOutputStream.writeObject(defaultMessage);
             System.out.println("Message forwarded to server-" + serverChosen);
 
         } catch (ClassNotFoundException ex) {
@@ -80,6 +66,11 @@ public class LoadBalancer extends Thread {
 
     public void run() {
         System.out.println("Load Balancer thread is up and running");
+        try {
+            this.inputStream = new ObjectInputStream(socket.getInputStream());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         while(true) {
             loadProcessing();
         }

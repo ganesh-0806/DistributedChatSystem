@@ -23,8 +23,8 @@ public class BrokerHandler {
 
     BrokerHandler() {
         try{
-            InetAddress host = InetAddress.getLocalHost();
-            socket = new Socket("100.26.218.146", 8888);
+            InetAddress host = InetAddress.getLocalHost();//100.26.218.146
+            socket = new Socket("127.0.0.1", 8888);
             brokerOutputStream = new ObjectOutputStream (socket.getOutputStream());
         } catch (UnknownHostException e) {
             throw new RuntimeException(e);
@@ -35,8 +35,10 @@ public class BrokerHandler {
 
     public void send(Message message)
     {
+        System.out.println("semding message " + message.getFromUser().getUserName());
         try {
             brokerOutputStream.writeObject(message);
+            brokerOutputStream.flush();
         }
         catch (IOException e) {
 

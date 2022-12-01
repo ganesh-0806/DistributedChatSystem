@@ -96,6 +96,8 @@ public class ClientHandler implements Runnable {
     }
 
     public void sendFriendResponse(FriendMessage friendMessage) {
+        System.out.println("Friends response");
+        System.out.println(friendMessage);
         ObjectMapper mapper = new ObjectMapper();
         try {
             String messageJson = mapper.writeValueAsString(friendMessage);

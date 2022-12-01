@@ -11,55 +11,49 @@ public class ServerHandler implements Runnable{
     private Socket socket;
     public ServerHandler(Socket socket) {
         this.socket = socket;
-
     }
 
     @Override
     public void run() {
-        ObjectInputStream inp = null;
-        Message msg;
         try {
-            inp = new ObjectInputStream(socket.getInputStream());
-            // TODO: verify if this gives messgase class
-            msg = (Message) inp.readObject();
-        } catch (IOException e) {
-            return;
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+            ObjectInputStream inp = new ObjectInputStream(this.socket.getInputStream());
 
-        try {
-            if (msg == null) {
-                socket.close();
-                return;
-            }
-            else {
-                ClientCache clientCache = ClientCache.getInstance();
-
-                if(msg.getType() == MessageType.TEXT_MESSAGE) {
-                    User to = ((ChatMessage)msg).getToUser();
-                    ClientHandler clientHandler = clientCache.getClient(to.getUserName());
-                    if(clientHandler == null) {
-                        clientCache.addClient(to.getUserName(), new ClientHandler(to));
-                        clientHandler = clientCache.getClient(to.getUserName());
-                    }
-                    clientHandler.addMessage((ChatMessage) msg);
+            Message msg;
+            while(true) {
+                // TODO: verify if this gives messgase class
+                msg = (Message) inp.readObject();
+                if (msg == null) {
+                    socket.close();
+                    return;
                 }
                 else {
-                    ClientHandler clientHandler = clientCache.getClient(msg.getFromUser().getUserName());
+                    ClientCache clientCache = ClientCache.getInstance();
 
-                    if(msg.getType() == MessageType.USER_LOGIN_FAIL || msg.getType() == MessageType.USER_LOGIN_SUCCESSFUL
-                        || msg.getType() == MessageType.USER_LOGOUT_FAIL || msg.getType() == MessageType.USER_LOGOUT_SUCCESSFUL) {
-                        clientHandler.sendAuthResponse((UserMessage) msg);
-                    }
-                    else {
-                        clientHandler.sendFriendResponse((FriendMessage) msg);
+                    if (msg.getType() == MessageType.TEXT_MESSAGE) {
+                        User to = ((ChatMessage) msg).getToUser();
+                        ClientHandler clientHandler = clientCache.getClient(to.getUserName());
+                        if (clientHandler == null) {
+                            clientCache.addClient(to.getUserName(), new ClientHandler(to));
+                            clientHandler = clientCache.getClient(to.getUserName());
+                        }
+                        clientHandler.addMessage((ChatMessage) msg);
+                    } else {
+                        ClientHandler clientHandler = clientCache.getClient(msg.getFromUser().getUserName());
+
+                        if (msg.getType() == MessageType.USER_LOGIN_FAIL || msg.getType() == MessageType.USER_LOGIN_SUCCESSFUL
+                                || msg.getType() == MessageType.USER_LOGOUT_FAIL || msg.getType() == MessageType.USER_LOGOUT_SUCCESSFUL) {
+                            clientHandler.sendAuthResponse((UserMessage) msg);
+                        } else {
+                            clientHandler.sendFriendResponse((FriendMessage) msg);
+                        }
                     }
                 }
-            }
-        }
-        catch (IOException e){
 
+            }
+        } catch (Exception e) {
+            System.out.println(e);
         }
+
+
     }
 }

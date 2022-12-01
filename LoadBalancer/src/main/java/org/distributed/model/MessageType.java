@@ -3,6 +3,24 @@ package org.distributed.model;
 import java.io.Serializable;
 
 public enum MessageType implements Serializable {
-    ADD_USER, TEXT_MESSAGE, USER_LOGIN_FAIL, USER_LOGIN_SUCCESSFUL, USER_LOGOUT, USER_LOGOUT_FAIL, USER_LOGOUT_SUCCESSFUL, SERVER_JOINED, SERVER_EXITED
+
+    // User Message
+    ADD_USER,
+    USER_LOGIN_SUCCESSFUL,
+    USER_LOGIN_FAIL,
+    USER_LOGOUT,
+    USER_LOGOUT_SUCCESSFUL,
+    USER_LOGOUT_FAIL,
+    // Friend Message
+    ADD_FRIEND_REQUEST,
+    ADD_FRIEND_SUCCESSFUL,
+    ADD_FRIEND_FAIL,
+    GET_FRIENDS_REQUEST,
+    GET_FRIENDS_SUCCESSFUL,
+    GET_FRIENDS_FAIL,
+    // Chat Message
+    TEXT_MESSAGE,
+    SERVER_JOINED,
+    SERVER_EXITED
 
 }

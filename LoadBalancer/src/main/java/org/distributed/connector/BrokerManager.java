@@ -23,7 +23,7 @@ public class BrokerManager extends Thread{
         while (true) {
             try {
                 Socket socket = serverSocket.accept();
-                LoadBalancer loadBalancer=new LoadBalancer(socket);
+                LoadBalancer loadBalancer = new LoadBalancer(socket);
                 loadBalancer.start();
             } catch (IOException e) {
                 System.out.println("I/O error: " + e);

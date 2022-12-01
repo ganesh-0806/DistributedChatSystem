@@ -14,7 +14,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class ServerCache {
     private static ServerCache instance = null;
-    private HashMap<ServerHandler, Socket> serverSockets;
     static int id=0;
     private HashMap<String, Integer> serverStatus;
     private HashMap<Integer, ServerHandler> serverMapping;
@@ -31,21 +30,17 @@ public class ServerCache {
     private ServerCache() {
         serverMapping = new HashMap<Integer, ServerHandler>();
         serverStatus = new HashMap<String, Integer>();
-        serverSockets = new HashMap<ServerHandler, Socket>();
     }
 
     public HashMap<Integer, ServerHandler> getServerMapping() {
         return serverMapping;
     }
 
-    public HashMap<ServerHandler, Socket> getServerSockets() {
-        return serverSockets;
-    }
-
     public void extendServerMapping(ServerHandler s, Integer n) {
         //TO-DO: add new server to the mapping
+        System.out.println("Server mapping about to be filled");
         serverMapping.put(id++, s);
-        serverSockets.put(s, s.getSocket());
+        System.out.println("Server mapping is filled");
     }
 
     public void reFreshServerStatus() {
@@ -81,7 +76,6 @@ public class ServerCache {
             }
             if(exitedNodeID!=-1)
                 serverMapping.remove(exitedNodeID);
-            serverSockets.remove(exited);
         }
     }
     public void heartBeatListener(ServerMessage message, String senderSocketAddress) {

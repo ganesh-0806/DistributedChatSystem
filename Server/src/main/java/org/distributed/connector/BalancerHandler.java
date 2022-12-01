@@ -26,10 +26,9 @@ public class BalancerHandler implements Runnable {
         this.port = port;
         try {
             mongoConnection= MongoConnection.getInstance();
-            host = InetAddress.getLocalHost();
-            socket = new Socket("100.25.204.112", this.port);
-            inputStream = new ObjectInputStream(socket.getInputStream());
-            outputStream = new ObjectOutputStream (socket.getOutputStream());
+            host = InetAddress.getLocalHost(); //100.25.204.112
+            socket = new Socket("127.0.0.1", this.port);
+            outputStream = new ObjectOutputStream(socket.getOutputStream());
             this.brokerHandler = BrokerHandler.getInstance();
             //outputStream = (ObjectOutputStream) socket.getOutputStream();
         } catch (UnknownHostException e) {
@@ -42,6 +41,7 @@ public class BalancerHandler implements Runnable {
     public void send(Message msg){
         try {
             outputStream.writeObject(msg);
+            outputStream.flush();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -49,9 +49,11 @@ public class BalancerHandler implements Runnable {
 
     @Override
     public void run() {
-        while (true) {
+
+        try {
+            inputStream = new ObjectInputStream(socket.getInputStream());
+            while (true) {
             //TODO: typecast read input into message
-            try {
                 System.out.println("Before read");
                 msg = (Message) inputStream.readObject();
                 System.out.println("After read ");
@@ -68,7 +70,6 @@ public class BalancerHandler implements Runnable {
                     //1. check if user exists in db
                     //if no, add user and return USER_LOGIN_SUCCESSFUL
                     //else, return USER_LOGIN_FAIL
-                    boolean userExists = false;
                     if (mongoConnection.isUserExists(msg.getFromUser().getUserName())) {
                         if (mongoConnection.isUserValid(msg.getFromUser().getUserName(), msg1.getPassword())) {
                             msg1.setPassword("");
@@ -87,8 +88,11 @@ public class BalancerHandler implements Runnable {
                     brokerHandler.send(msg1);
                 }
                 else if (msg.getMessageType() == ADD_FRIEND_REQUEST) {
+
                     FriendMessage msg1 = (FriendMessage) msg;
                     User user2 = msg1.getFriends().get(0);
+
+                    System.out.println("Add friend request from " + msg.getFromUser().getUserName() + " to "+user2.getUserName());
 
                     if(mongoConnection.isUserExists(msg1.getFromUser().getUserName()) && mongoConnection.isUserExists(user2.getUserName())) {
                         mongoConnection.addFriend(msg1.getFromUser().getUserName(), user2.getUserName());
@@ -105,6 +109,7 @@ public class BalancerHandler implements Runnable {
                     ServerMessage msg1 = (ServerMessage) msg;
                     serverCache.removeIp(msg1.getMessageContent());
                 }else {
+                    System.out.println("Get friends request " + msg.getFromUser().getUserName());
                     //msg.getMessageType() = GET_FRIENDS_REQUEST
                     FriendMessage msg1 = (FriendMessage) msg;
                     //TODO: Get friends from db
@@ -112,13 +117,16 @@ public class BalancerHandler implements Runnable {
                     for (User f : friends) {
                         msg1.addFriend(f);
                     }
+                    msg1.setMessageType(GET_FRIENDS_SUCCESSFUL);
                     brokerHandler.send(msg1);
                 }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
             }
+        }
+        catch (IOException e) {
+            System.out.println(e);
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
         }
     }
 }
