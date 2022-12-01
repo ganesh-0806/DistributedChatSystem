@@ -11,9 +11,9 @@ This component is to directly interact with reactJS UI. Each client is seperatel
 1. Open the maven project in intelliJ
 2. Install maven dependencies for the project
 3. Open terminal and go to root folder
-4. Create the application jar file__
+4. Create the application jar file <br>
   mvn clean package
-5. Run the application__
+5. Run the application <br>
   java -jar \<generated jar file in target folder\>
   
 Note: If you need to run on local host, update the ip addresses accordingly
