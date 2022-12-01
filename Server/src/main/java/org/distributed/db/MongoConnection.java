@@ -18,11 +18,6 @@ public class MongoConnection {
     MongoConnection()
     {
         String database="chatApplication";
-        String connectionString="mongodb://34.227.7.28:27017";
-        /*const client = new MongoClient(Config.database.url, {
-            connectTimeoutMS: 5000,
-            serverSelectionTimeoutMS: 5000
-})*/
         String mongoUri ="mongodb://34.224.32.12:27017/chatApplication";
 
 

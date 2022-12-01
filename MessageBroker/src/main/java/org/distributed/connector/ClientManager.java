@@ -86,7 +86,7 @@ public class ClientManager extends WebSocketServer {
         try {
             //InetAddress host = InetAddress.getByName("54.157.162.179");
              //host = InetAddress.getLocalHost();100.25.204.112
-             loadSocket = new Socket("127.0.0.1", 8081);
+             loadSocket = new Socket("52.91.128.0", 8081);
              System.out.println(loadSocket.isConnected());
              loadOutputStream = new ObjectOutputStream(loadSocket.getOutputStream());
         } catch (UnknownHostException e) {
