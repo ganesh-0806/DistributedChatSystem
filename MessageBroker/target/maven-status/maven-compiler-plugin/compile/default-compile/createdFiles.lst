@@ -1,0 +1,4 @@
+org\distributed\connector\ServerManager.class
+org\distributed\connector\ClientManager.class
+org\distributed\connector\ClientManager$1.class
+org\distributed\Main.class
