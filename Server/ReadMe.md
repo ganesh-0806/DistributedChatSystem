@@ -1,5 +1,7 @@
 ## Server
 
+This component interacts with Database, BrokerHandler and BalancerHandler. Messages from clients are received and categorized according to type in BalancerHandler. 
+They are then sent to BrokerHandler which talks with the database in order to store this information. Server futher implements ping-ack protocol for fault detection and to get notified about the joined server nodes.
 
 # Requirements:
 1. JVM
