@@ -12,30 +12,19 @@ import java.util.concurrent.TimeUnit;
 
 public class ServerHandler extends Thread {
     int serverPort;
-    String serverAddress;
-    ServerMessage message;
-    ServerSocket serverSocket;
     Socket socket;
-    String senderSocketAddress;
     String socketAddress;
     ObjectInputStream ois;
-    LoadBalancer loadBalancer;
-    /*
-    public ServerHandler(int serverPort) {
-        this.serverPort = serverPort;
-    }*/
 
     public ServerHandler(Socket socket)
     {
         this.socket=socket;
-        loadBalancer = new LoadBalancer();
     }
-    /*
-    public ServerHandler(ServerMessage msg, String senderSocketAddress) {
-        this.message = msg;
-        this.senderSocketAddress = senderSocketAddress;
+
+    public Socket getSocket() {
+        return socket;
     }
-*/
+
     public ServerHandler(String socketAddress)
     {
         this.socketAddress=socketAddress;
@@ -45,7 +34,6 @@ public class ServerHandler extends Thread {
         while(true) {
 
             readMessage(socket);
-           // loadBalancer.heartBeatListener(message, senderSocketAddress);
         }
     }
 
@@ -53,7 +41,7 @@ public class ServerHandler extends Thread {
         try {
             ois=new ObjectInputStream(socket.getInputStream());
             ServerMessage serverMessage=(ServerMessage) ois.readObject();
-            loadBalancer.heartBeatListener(serverMessage, socket.getInetAddress().getHostAddress());
+            ServerCache.getInstance().heartBeatListener(serverMessage, socket.getInetAddress().getHostAddress());
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (ClassNotFoundException e) {
@@ -71,23 +59,6 @@ public class ServerHandler extends Thread {
             return InetAddress.getLocalHost().toString();
         } catch (UnknownHostException e) {
             throw new RuntimeException(e);
-        }
-    }
-}
-class ServerHelper extends Thread
-{
-    long oldTime= TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
-    long newTime;
-    public void run()
-    {
-        while(true)
-        {
-            newTime= TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
-            if(newTime-oldTime>30)
-            {
-                LoadBalancer.reFreshServerStatus();
-                oldTime=newTime;
-            }
         }
     }
 }

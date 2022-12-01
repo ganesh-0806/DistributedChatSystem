@@ -27,7 +27,7 @@ public class BalancerHandler implements Runnable {
         try {
             mongoConnection= MongoConnection.getInstance();
             host = InetAddress.getLocalHost();
-            socket = new Socket(host, this.port);
+            socket = new Socket("100.25.204.112", this.port);
             inputStream = new ObjectInputStream(socket.getInputStream());
             outputStream = new ObjectOutputStream (socket.getOutputStream());
             this.brokerHandler = BrokerHandler.getInstance();

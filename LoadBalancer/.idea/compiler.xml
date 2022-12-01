@@ -7,6 +7,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="LoadBalancer2" />
+        <module name="LoadBalancer" />
       </profile>
     </annotationProcessing>
   </component>

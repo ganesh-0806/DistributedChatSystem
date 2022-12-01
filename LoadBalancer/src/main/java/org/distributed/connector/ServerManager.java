@@ -1,5 +1,6 @@
 package org.distributed.connector;
 
+import org.distributed.loadBalancer.ServerCache;
 import org.distributed.loadBalancer.ServerHandler;
 
 import java.io.IOException;
@@ -17,7 +18,9 @@ public class ServerManager extends Thread {
         try {
             loadServerSocket=new ServerSocket(9091);
             loadSocket= loadServerSocket.accept();
-            new ServerHandler(loadSocket).start();
+            ServerHandler handler = new ServerHandler(loadSocket);
+            handler.start();
+            ServerCache.getInstance().extendServerMapping(handler, 1);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
