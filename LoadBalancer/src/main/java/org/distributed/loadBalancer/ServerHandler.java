@@ -1,6 +1,6 @@
-package org.example.loadBalancer;
+package org.distributed.loadBalancer;
 
-import org.example.model.ServerMessage;
+import org.distributed.model.ServerMessage;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -8,6 +8,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.concurrent.TimeUnit;
 
 public class ServerHandler extends Thread {
     int serverPort;
@@ -42,6 +43,7 @@ public class ServerHandler extends Thread {
 
     public void run() {
         while(true) {
+
             readMessage(socket);
            // loadBalancer.heartBeatListener(message, senderSocketAddress);
         }
@@ -69,6 +71,23 @@ public class ServerHandler extends Thread {
             return InetAddress.getLocalHost().toString();
         } catch (UnknownHostException e) {
             throw new RuntimeException(e);
+        }
+    }
+}
+class ServerHelper extends Thread
+{
+    long oldTime= TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
+    long newTime;
+    public void run()
+    {
+        while(true)
+        {
+            newTime= TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
+            if(newTime-oldTime>30)
+            {
+                LoadBalancer.reFreshServerStatus();
+                oldTime=newTime;
+            }
         }
     }
 }

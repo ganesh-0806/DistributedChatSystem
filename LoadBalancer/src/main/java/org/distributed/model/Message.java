@@ -1,8 +1,11 @@
-package org.example.model;
-import org.example.model.MessageType;
-public class Message {
+package org.distributed.model;
+
+import java.io.Serializable;
+
+public class Message implements Serializable {
     private User fromUser;
     public MessageType type;
+    private static final long serialVersionUID = 1L;
 
     Message(User user, MessageType type){
         this.fromUser = user;

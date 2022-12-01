@@ -1,7 +1,7 @@
-package org.example.connector;
+package org.distributed.connector;
 
-import org.example.loadBalancer.LoadBalancer;
-import org.example.loadBalancer.ServerHandler;
+import org.distributed.loadBalancer.LoadBalancer;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -9,14 +9,20 @@ import java.net.Socket;
 public class BrokerManager extends Thread{
     private int port;
     private ServerSocket serverSocket;
-    private Socket socket;
 
-    @Override
+
+    public BrokerManager()
+    {
+        try {
+            serverSocket=new ServerSocket(8081);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
     public void run() {
         while (true) {
             try {
-                serverSocket=new ServerSocket(8080);
-                socket = serverSocket.accept();
+                Socket socket = serverSocket.accept();
                 LoadBalancer loadBalancer=new LoadBalancer(socket);
                 loadBalancer.start();
             } catch (IOException e) {

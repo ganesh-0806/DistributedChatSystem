@@ -1,4 +1,4 @@
-package org.example.model;
+package org.distributed.model;
 
 public class ServerMessage {
     private MessageType messageType;

@@ -1,13 +1,13 @@
-package org.example.loadBalancer;
+package org.distributed.loadBalancer;
 
-import org.example.connector.*;
-import org.example.model.*;
+import org.distributed.connector.*;
+import org.distributed.model.*;
 import java.io.IOException;
 import java.io.*;
 import java.net.ServerSocket;
-import java.net.*;
 import java.util.*;
 import java.net.Socket;
+import java.util.concurrent.TimeUnit;
 
 public class LoadBalancer extends Thread {
 
@@ -20,19 +20,20 @@ public class LoadBalancer extends Thread {
     static int id=0;
     HashMap<Integer, ServerHandler> serverMapping;
     HashMap<ServerHandler, Socket> serverSockets;
+    static HashMap<String, Integer> serverStatus;
     LoadBalancer loadBalancer;
     //ArrayList<LoadBalancer> peers;
     ServerSocket serverSocket;
     Socket loadBalancerSocket;
     String loadBalancerAddress;
-    int loadBalancerPort;
-    DataInputStream inputStream;
+    public static int loadBalancerPort=8081;
+    ObjectInputStream inputStream;
     Socket socket;
 
     public LoadBalancer(Socket socket) {
         this.socket = socket;
         try {
-            this.inputStream = (DataInputStream) socket.getInputStream();
+            this.inputStream = new ObjectInputStream(new DataInputStream(socket.getInputStream()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -47,15 +48,37 @@ public class LoadBalancer extends Thread {
     {
         this("localhost", 8081);
     }
-    LoadBalancer(String address, int port) {
+    public LoadBalancer(String address, int port) {
         this.loadBalancerAddress = address;
         this.loadBalancerPort = port;
+        try {
+            socket=new Socket(address, port);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void reFreshServerStatus() {
+        for(Map.Entry<String, Integer> server : serverStatus.entrySet()) {
+            String key = server.getKey();
+            serverStatus.put(key,0);
+        }
     }
 
     public LoadBalancer getLoadBalancer() {
         return loadBalancer;
     }
 
+    public void initiateServerStatus()
+    {
+        serverStatus=new HashMap();
+        for(Map.Entry<Integer, ServerHandler> server : serverMapping.entrySet()) {
+            String key = server.getValue().socketAddress;
+            serverStatus.put(key,0);
+        }
+        ServerHelper serverHelper=new ServerHelper();
+        serverHelper.start();
+    }
     public void setLoadBalancer(int port) {
         loadBalancer = new LoadBalancer(this.loadBalancerAddress, port);
     }
@@ -93,51 +116,50 @@ public class LoadBalancer extends Thread {
 
     }
 
-    public void loadProcessing(Socket socket) {
-        DataInputStream in = null;
+    public void loadProcessing() {
+
+        System.out.println("In loadBalancer's loadProcessing method");
+        String clientUserName;
         try {
-            in = new DataInputStream(socket.getInputStream());
-            ObjectInputStream input = new ObjectInputStream(in);
-
-            Message message;
-            String clientUserName;
-            try {
-                Message defaultMessage = (Message) input.readObject();
-                if (defaultMessage.type == MessageType.TEXT_MESSAGE) {
-                    message = (ChatMessage) input.readObject();
-                    clientUserName = ((ChatMessage) message).getToUser().getUserName();
-                } else {
-                    message = (UserMessage) input.readObject();
-                    clientUserName = null;
-                }
-
-
-                System.out.println(clientUserName);
-
-                //sending messages from loadBalancer to any specific server;
-                int serverChosen=0;
-                if(clientUserName==null)
-                {
-                    Random randomServerMap=new Random();
-                    serverChosen=randomServerMap.nextInt(serverMapping.size());
-                }
-                else {
-                    serverChosen = generateHash(clientUserName);
-                }
-                ServerHandler destinationServer = serverMapping.get(serverChosen);
-                Socket destination=serverSockets.get(destinationServer);
-
-                DataOutputStream out = new DataOutputStream(destination.getOutputStream());
-                ObjectOutputStream objectOutputStream = new ObjectOutputStream(out);
-
-                objectOutputStream.writeObject(input);
-                System.out.println("Message forwarded to server-" + serverChosen);
-
-            } catch (ClassNotFoundException ex) {
-
+            System.out.println("Reading message");
+            Message defaultMessage = (Message) inputStream.readObject();
+            System.out.println("Message type:"+defaultMessage.getFromUser().getUserName());
+            UserMessage uMsg = (UserMessage) defaultMessage;
+            System.out.println("Message type:"+uMsg.getFromUser().getUserName());
+            if(defaultMessage==null)
+            {
+                socket.close();
             }
+            if (defaultMessage.type == MessageType.TEXT_MESSAGE) {
+                ChatMessage message = (ChatMessage) defaultMessage;
+                clientUserName = message.getToUser().getUserName();
+            } else {
+                UserMessage message = (UserMessage) defaultMessage;
+                clientUserName = null;
+            }
+
+            //sending messages from loadBalancer to any specific server;
+            int serverChosen=0;
+            if(clientUserName==null)
+            {
+                Random randomServerMap=new Random();
+                serverChosen=randomServerMap.nextInt(serverMapping.size());
+            }
+            else {
+                serverChosen = generateHash(clientUserName);
+            }
+            ServerHandler destinationServer = serverMapping.get(serverChosen);
+            Socket destination=serverSockets.get(destinationServer);
+
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(destination.getOutputStream());
+
+            objectOutputStream.writeObject(defaultMessage);
+            System.out.println("Message forwarded to server-" + serverChosen);
+
+        } catch (ClassNotFoundException ex) {
+            System.out.println(ex);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println(e);
         }
     }
 
@@ -145,20 +167,8 @@ public class LoadBalancer extends Thread {
         // HTTPConnectionWrapper socket=new HTTPConnectionWrapper(8080);
         System.out.println("Load Balancer thread is up and running");
         while(true) {
-            loadProcessing(this.socket);
+            loadProcessing();
         }
-    }
-
-    public static void main(String args[]) {
-        LoadBalancer loadBalancer = null;
-
-        try {
-            System.out.println(InetAddress.getLocalHost());
-            loadBalancer = new LoadBalancer(InetAddress.getLocalHost().getHostAddress(), 8081);
-        } catch (UnknownHostException e) {
-            throw new RuntimeException(e);
-        }
-        loadBalancer.start();
     }
 
     public int generateHash(String clientName) {
@@ -178,7 +188,13 @@ public class LoadBalancer extends Thread {
             }
             else if(message.getMessageType().equals(MessageType.SERVER_EXITED))
             {
-                shrinkServerMapping(message.getMessageContent());
+                long timeSeconds = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
+                int statusSoFar=serverStatus.get(message.getMessageContent());
+                if(statusSoFar==serverMapping.size()-1) {
+                    shrinkServerMapping(message.getMessageContent());
+                }
+                else
+                    serverStatus.put(message.getMessageContent(),serverStatus.get(message.getMessageContent())+1);
             }
         }
     }
